@@ -1,6 +1,6 @@
 # Tapdaq Cordova Plugin
 
-Tapdaq's official plugin for Apache Cordova.
+Tapdaq's official plugin for Apache Cordova. The plugin supports iOS only, Android support will be coming soon.
 
 ## Installation
 
