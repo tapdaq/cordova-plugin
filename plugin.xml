@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.tapdaq.CDVTapdaq" version="1.0.0">
+        id="com.tapdaq.cdvtapdaq" version="1.0.0">
     <name>Tapdaq</name>
-    <description>Cordova Tapdaq Plugin</description>
-    <keywords>cordova,tapdaq,ads,advertising,promotion,cross,cross-promotion</keywords>
+    <description>Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.</description>
+    <keywords>cordova,tapdaq,ads,advertising,promotion,cross,cross-promotion,retention,direct,marketing</keywords>
     <js-module src="www/tapdaq.js" name="CDVTapdaq">
         <clobbers target="Tapdaq" />
     </js-module>

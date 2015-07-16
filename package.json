@@ -2,7 +2,7 @@
     "version": "1.0.0",
     "name": "com.tapdaq.cdvtapdaq",
     "cordova_name": "Tapdaq",
-    "description": "Cordova Tapdaq Plugin",
+    "description": "Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.",
     "keywords": [
         "cordova",
         "tapdaq",
@@ -10,7 +10,10 @@
         "advertising",
         "promotion",
         "cross",
-        "cross-promotion"
+        "cross-promotion",
+        "retention",
+        "direct",
+        "marketing"
     ],
     "platforms": [
         "ios"

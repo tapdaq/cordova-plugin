@@ -39,9 +39,9 @@ The config object passed to `Tapdaq.setOptions()` contains the following options
 
 ```javascript
 {
-    testAdvertsEnabled: true|false, # sets the SDK to test mode, must be set to false when app is released
-    trackInstallsOnly: true|false, # turns off ad fetching, adverts will not display
-    orientation: "universal|portrait|landscape" # forces an orientation in the SDK
+    testAdvertsEnabled: true|false, // sets the SDK to test mode, must be set to false when app is released
+    trackInstallsOnly: true|false, // turns off ad fetching, adverts will not display
+    orientation: "universal|portrait|landscape" // forces an orientation in the SDK
 }
 ```
         
