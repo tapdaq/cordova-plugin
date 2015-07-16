@@ -240,6 +240,7 @@ THe native advert structure is as follows:
 		(NSString) applicationId
 		(NSString) targetingId
 		(NSString) subscriptionId // (optional) 
+		(NSString) title
 		(NSString) appName
 		(NSString) appDescription
 		(NSString) buttonText
@@ -256,6 +257,8 @@ THe native advert structure is as follows:
 		(TDNativeAdSize) adSize // Can be either `TDNativeAdSizeSmall`, `TDNativeAdSizeMedium`, `TDNativeAdSizeLarge`
 		(NSURL) iconUrl
 		(UIImage) icon
+		(NSURL) customUrl
+		(BOOL) isBlockingInstalledApp
 		(TDCreative) creative =>
 			(NSString) identifier
 			(TDOrientation) orientation // Can be either `TDOrientationPortrait` or `TDOrientationLandscape
@@ -290,3 +293,38 @@ you can update the config dictionary like so:
     [tapdaqConfig setObject:[NSNumber numberWithInt:7] forKey:@"frequencyDurationInDays"];
 
 This example will change the frequency to 1 per week.
+
+
+#### Ad Mediation Mode
+
+Mediation mode allows you to have full control over when to fetch an advert from the Tapdaq servers.
+
+To enable mediation mode, add the following to the config dictionary:
+
+	[tapdaqConfig setObject:@YES forKey:@"mediationModeEnabled"];
+
+One that is enabled, you can use the following method calls to load the advert:
+
+	- (void)loadNativeAdvertForAdUnit:(TDNativeAdUnit)adUnit
+                             size:(TDNativeAdSize)adSize
+                      orientation:(TDOrientation)orientation;
+
+    - (void)loadInterstitialAdvertForOrientation:(TDOrientation)orientation;
+
+This will load the interstitial or native advert, which is sent to the TapdaqDelegate. The following methods are provided for you to handle
+when an advert fails or is successfully loaded.
+
+	- (void)didLoadNativeAdvert:(TDNativeAdvert *)advert
+	                  forAdUnit:(TDNativeAdUnit)adUnit
+	                       size:(TDNativeAdSize)adSize
+	                orientation:(TDOrientation)orientation;
+
+	- (void)didFailToLoadNativeAdvertForAdUnit:(TDNativeAdUnit)adUnit
+	                                      size:(TDNativeAdSize)adSize
+	                               orientation:(TDOrientation)orientation;
+
+
+	- (void)didLoadInterstitial:(TDInterstitialAdvert *)advert forOrientation:(TDOrientation)orientation;
+
+	- (void)didFailToLoadInterstitialForOrientation:(TDOrientation)orientation;
+

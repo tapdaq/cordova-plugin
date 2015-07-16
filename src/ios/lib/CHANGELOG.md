@@ -37,5 +37,19 @@
 
 # 0.9.2 (2015-06-08) 
 
-- Bug fixes and optimisations surrounding NSOperationQueue and async
-NSURLConnection objects
+- Bug fixes and optimisations surrounding NSOperationQueue and async NSURLConnection objects
+
+# 0.9.2-rc1 (2015-06-10)
+
+- Fix for Unity where delegate was losing location of pointer
+
+# 0.9.3 (2015-06-23)
+
+- Introducing ad mediation mode. This allows developers to integrate Tapdaq into Admob and other mediation tools.
+- Full control over when an advert is loaded
+- Delegate methods for when an advert fails or is successfully loaded
+- Improved queue management of adverts
+
+# 0.9.3-rc5 (2015-07-08) 
+
+- Added ability for wrappers to include a SDK identifier prefix in the config 

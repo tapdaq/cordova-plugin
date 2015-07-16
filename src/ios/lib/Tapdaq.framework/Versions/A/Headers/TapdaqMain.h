@@ -20,10 +20,10 @@
 
 @interface Tapdaq : NSObject
 
-@property (nonatomic, assign) id <TapdaqDelegate> delegate;
+@property (nonatomic, weak) id <TapdaqDelegate> delegate;
 
 // The singleton Tapdaq object, use this for all method calls
-+ (id)sharedSession;
++ (instancetype)sharedSession;
 
 // A setter for the Application ID of your app, and the Client Key associated with your Tapdaq account
 - (void)setApplicationId:(NSString *)applicationId
@@ -41,6 +41,8 @@
 
 - (TDInterstitialAdvert *)getInterstitialAdvertForOrientation:(TDOrientation)orientation;
 
+- (void)loadInterstitialAdvertForOrientation:(TDOrientation)orientation;
+
 // Gets a native advert - expects config defaults to be set
 - (TDNativeAdvert *)getNativeAdvertForAdUnit:(TDNativeAdUnit)adUnit
                                         size:(TDNativeAdSize)adSize;
@@ -49,10 +51,16 @@
                                         size:(TDNativeAdSize)adSize
                                  orientation:(TDOrientation)orientation;
 
+- (void)loadNativeAdvertForAdUnit:(TDNativeAdUnit)adUnit
+                             size:(TDNativeAdSize)adSize
+                      orientation:(TDOrientation)orientation;
+
 /** 
  Displays an interstitial to the user, if an interstitial is available to be shown. This method will time out gracefully (ie. no exception thrown) after 3 seconds if no advert is presented to the user in that time.
  */
 - (void)showInterstitial;
+
+- (void)showInterstitial:(UIView *)view;
 
 - (void)triggerImpression:(TDAdvert *)advert;
 - (void)sendImpression:(TDAdvert *)advert;
@@ -61,9 +69,6 @@
 - (void)sendClick:(TDAdvert *)advert;
 
 - (void)launch;
-
-// If you have disabled automatic advert fetching on application launch, then calling this method will begin fetching advert queues
-- (void)fetchAds;
 
 @end
 
@@ -87,6 +92,8 @@
 // interstitials from the Tapdaq servers
 - (void)didFailToLoadInterstitial;
 
+- (void)didFailToShowInterstitial;
+
 // Called when the request for interstitials was successful,
 // but no interstitials were found
 - (void)hasNoInterstitialsAvailable;
@@ -95,11 +102,24 @@
 // and 1 or more interstitials were found
 - (void)hasInterstitialsAvailableForOrientation:(TDOrientation)orientation;
 
+- (void)didLoadInterstitial:(TDInterstitialAdvert *)advert forOrientation:(TDOrientation)orientation;
+- (void)didFailToLoadInterstitialForOrientation:(TDOrientation)orientation;
+
 - (void)didFailToLoadNativeAdverts;
 
 - (void)hasNoNativeAdvertsAvailable;
 
 - (void)hasNativeAdvertsAvailableForAdUnit:(TDNativeAdUnit)adUnit
+                                      size:(TDNativeAdSize)adSize
+                               orientation:(TDOrientation)orientation;
+
+
+- (void)didLoadNativeAdvert:(TDNativeAdvert *)advert
+                  forAdUnit:(TDNativeAdUnit)adUnit
+                       size:(TDNativeAdSize)adSize
+                orientation:(TDOrientation)orientation;
+
+- (void)didFailToLoadNativeAdvertForAdUnit:(TDNativeAdUnit)adUnit
                                       size:(TDNativeAdSize)adSize
                                orientation:(TDOrientation)orientation;
 
