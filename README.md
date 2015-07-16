@@ -50,8 +50,8 @@ The config object passed to `Tapdaq.setOptions()` contains the following options
 The following sets Tapdaq to test mode and forces the orientation to portrait.
     
 ```javascript
-    Tapdaq.setOptions({
-        testAdvertsEnabled: true,
-        orientation: "portrait"
-    });
+ Tapdaq.setOptions({
+    testAdvertsEnabled: true,
+    orientation: "portrait"
+});
 ```
