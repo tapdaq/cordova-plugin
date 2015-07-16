@@ -11,7 +11,7 @@ Tapdaq's official plugin for Apache Cordova.
 To get started, sign up to Tapdaq and add your application. 
 You will then be given an `appId` and `clientKey` under the app settings.
     
-Once you have got those, add the following:
+Once you have got those, add the following inside your app's `#onDeviceReady` method:
     
     Tapdaq.setOptions({ 
       testAdvertsEnabled: true # Set to false when submitting to the app store!
