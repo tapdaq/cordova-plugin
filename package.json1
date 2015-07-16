@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+    "name": "com.tapdaq.cdvtapdaq",
+    "cordova_name": "Tapdaq",
+    "description": "Cordova Tapdaq Plugin",
+    "keywords": [
+        "cordova",
+        "tapdaq",
+        "ads",
+        "advertising",
+        "promotion",
+        "cross",
+        "cross-promotion"
+    ],
+    "platforms": [
+        "ios"
+    ],
+    "engines": []
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="cordova-plugin-tapdaq" version="1.0.0">
+        id="com.tapdaq.CDVTapdaq" version="1.0.0">
     <name>Tapdaq</name>
     <description>Cordova Tapdaq Plugin</description>
     <keywords>cordova,tapdaq,ads,advertising,promotion,cross,cross-promotion</keywords>
