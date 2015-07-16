@@ -7,6 +7,8 @@
 
 static NSString *const kConfigTestAdvertsEnabled = @"testAdvertsEnabled";
 static NSString *const kConfigSdkIdentifierPrefix = @"sdkIdentifierPrefix";
+static NSString *const kConfigTrackInstallsOnly = @"trackInstallsOnly";
+static NSString *const kConfigAdvertTypesEnabled = @"advertTypesEnabled";
 static NSString *const kConfigOrientation = @"orientation";
 
 @interface CDVTapdaq : CDVPlugin <TapdaqDelegate>
@@ -44,6 +46,14 @@ static NSString *const kConfigOrientation = @"orientation";
             [self.config setObject:[NSNumber numberWithInteger:TDOrientationLandscape] forKey:kConfigOrientation];
         } else if ([orientation isEqualToString:@"portrait"]) {
             [self.config setObject:[NSNumber numberWithInteger:TDOrientationPortrait] forKey:kConfigOrientation];
+        }
+    }
+    
+    if ([config objectForKey:kConfigTrackInstallsOnly]) {
+        BOOL trackInstallsOnly = [config objectForKey:kConfigTrackInstallsOnly];
+        
+        if (trackInstallsOnly) {
+            [self.config setObject:@[] forKey:kConfigAdvertTypesEnabled];
         }
     }
     
@@ -85,4 +95,3 @@ static NSString *const kConfigOrientation = @"orientation";
 }
 
 @end
-

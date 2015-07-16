@@ -32,12 +32,12 @@ To get the most out of the Tapdaq community, we recommend you display an interst
 The config object passed to `Tapdaq.setOptions()` contains the following options:
 
     {
-        testAdvertsEnabled: true|false,
-        trackInstallsOnly: true|false,
-        orientation: "universal|portrait|landscape"
+        testAdvertsEnabled: true|false, # sets the SDK to test mode, must be set to false when app is released
+        trackInstallsOnly: true|false, # turns off ad fetching, adverts will not display
+        orientation: "universal|portrait|landscape" # forces an orientation in the SDK
     }
         
-### Example 1
+### Example
 
 The following sets Tapdaq to test mode and forces the orientation to portrait.
     
@@ -45,4 +45,3 @@ The following sets Tapdaq to test mode and forces the orientation to portrait.
         testAdvertsEnabled: true,
         orientation: "portrait"
     });
-    
