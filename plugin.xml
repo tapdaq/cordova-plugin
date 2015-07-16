@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-tapdaq" version="1.0.0">
+    <name>Tapdaq</name>
+    <description>Cordova Tapdaq Plugin</description>
+    <keywords>cordova,tapdaq,ads,advertising,promotion,cross,cross-promotion</keywords>
+    <js-module src="www/tapdaq.js" name="CDVTapdaq">
+        <clobbers target="Tapdaq" />
+    </js-module>
+    <platform name="ios">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="CDVTapdaq">
+                <param name="ios-package" value="CDVTapdaq"/>
+                <param name="onload" value="true"/>
+            </feature>
+        </config-file>
+
+        <!-- Wrapper files -->
+        <source-file src="src/ios/CDVTapdaq.m" />
+
+        <!-- SDK -->
+        <framework src="src/ios/lib/Tapdaq.framework" custom="true" />
+        <resource-file src="src/ios/lib/TapdaqResources.bundle" />
+
+        <!-- Dependencies -->
+        <framework src="Foundation.framework" />
+        <framework src="UIKit.framework" />
+        <framework src="QuartzCore.framework" />
+        <framework src="AdSupport.framework" />
+
+    </platform>
+</plugin>
