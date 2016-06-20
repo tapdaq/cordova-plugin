@@ -9,6 +9,8 @@
     </js-module>
     <platform name="ios">
 
+        <hook type="before_plugin_add" src="scripts/download_ios_sdk.js" />
+
         <config-file target="config.xml" parent="/*">
             <feature name="CDVTapdaq">
                 <param name="ios-package" value="CDVTapdaq"/>
