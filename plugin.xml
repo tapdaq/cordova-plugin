@@ -23,7 +23,6 @@
 
         <!-- SDK -->
         <framework src="src/ios/lib/Tapdaq.framework" custom="true" />
-        <resource-file src="src/ios/lib/TapdaqResources.bundle" />
 
         <!-- Dependencies -->
         <framework src="Foundation.framework" />
