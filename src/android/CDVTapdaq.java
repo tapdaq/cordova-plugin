@@ -65,7 +65,7 @@ public class CDVTapdaq extends CordovaPlugin {
 
     boolean shouldExecute = false;
 
-    if (action.equals(ACTION_SET_OPTIONS) && args.size() == 1) {
+    if (action.equals(ACTION_SET_OPTIONS) && !args.isNull(0)) {
 
       JSONObject jsonMessage = args.getJSONObject(0);
       Map<String, Object> messageMap = this.getMapFromJSONObject(jsonMessage);
@@ -73,7 +73,7 @@ public class CDVTapdaq extends CordovaPlugin {
       handleSetOptions(messageMap, callbackContext);
       shouldExecute = true;
 
-    } else if (action.equals(ACTION_INIT) && args.size() == 2) {
+    } else if (action.equals(ACTION_INIT) && !args.isNull(0) && !args.isNull(1)) {
 
       String appId = args.getString(0);
       String clientKey = args.getString(1);
