@@ -1,9 +1,9 @@
 //
 //  TDCreative.h
-//  Tapdaq-sdk-v2
+//  Tapdaq
 //
-//  Created by Nick on 15/03/2015.
-//  Copyright (c) 2015 Tapdaq. All rights reserved.
+//  Created by Tapdaq <support@tapdaq.com>
+//  Copyright (c) 2016 Tapdaq. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -25,11 +25,6 @@
 
 - (id)initWithIdentifier:(NSString *)identifier
               resolution:(TDResolution)resolution
-             aspectRatio:(TDAspectRatio *)aspectRatio
-                     url:(NSURL *)url;
-
-- (id)initWithIdentifier:(NSString *)identifier
-        resolutionNumber:(int)resolution
              aspectRatio:(TDAspectRatio *)aspectRatio
                      url:(NSString *)url
              orientation:(TDOrientation)orientation;

@@ -1,15 +1,16 @@
 //
 //  TDNativeAdvert.h
-//  Tapdaq-sdk-v2
+//  Tapdaq
 //
-//  Created by Nick on 15/03/2015.
-//  Copyright (c) 2015 Tapdaq. All rights reserved.
+//  Created by Tapdaq <support@tapdaq.com>
+//  Copyright (c) 2016 Tapdaq. All rights reserved.
 //
 
 #import "TDAdvert.h"
 
 #import "TDNativeAdUnitEnum.h"
 #import "TDNativeAdSizeEnum.h"
+#import "TDNativeAdTypeEnum.h"
 #import "TDOrientationEnum.h"
 
 @interface TDNativeAdvert : TDAdvert
@@ -27,8 +28,9 @@
 @property (nonatomic) float price;
 @property (nonatomic, strong) NSString *currency;
 
-@property (nonatomic) TDNativeAdUnit adUnit;
-@property (nonatomic) TDNativeAdSize adSize;
+@property (nonatomic) TDNativeAdType adType;
+@property (nonatomic) TDNativeAdUnit adUnit __deprecated;
+@property (nonatomic) TDNativeAdSize adSize __deprecated;
 
 - (id)initWithApplicationId:(NSString *)applicationId
                 targetingId:(NSString *)targetingId
@@ -37,7 +39,8 @@
                   customUrl:(NSString *)customUrl
      isBlockingInstalledApp:(BOOL)isBlockingInstalledApp
                    creative:(TDCreative *)creative
-                       size:(TDNativeAdSize)size
+                        tag:(NSString *)tag
+                     adType:(TDNativeAdType)adType
                     iconUrl:(NSString *)iconUrl
                     appName:(NSString *)appName
                 description:(NSString *)description

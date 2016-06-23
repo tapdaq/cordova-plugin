@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Tapdaq"
-  s.version      = "0.9.3"
+  s.version      = "1.1.1"
   s.summary      = "Trade installs with other developers and cross promote your own app network"
 
   s.description  = <<-DESC
@@ -70,7 +70,7 @@ Already have an established app network? You can also cross promote your own app
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/tapdaq/tapdaq-ios-sdk.git", :tag => "0.9.3" }
+  s.source       = { :git => "https://github.com/tapdaq/tapdaq-ios-sdk.git", :tag => "1.1.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -94,7 +94,7 @@ Already have an established app network? You can also cross promote your own app
 
   # s.resource  = "icon.png"
   # s.resources = "Resources/*.png"
-  s.resource = "TapdaqResources.bundle"
+  # s.resource = "TapdaqResources.bundle"
 
   #s.preserve_paths = "Tapdaq.framework"
 
