@@ -5,6 +5,7 @@ var tapdaqNative = {
   service: "CDVTapdaq",
   setOptions: "setOptions",
   init: "init",
+  showInterstitial: "showInterstitial",
   resultEvent: "event",
   resultMessage: "message"
 };
@@ -23,50 +24,50 @@ var eventCallbacks = {
 var that = null;
 
 var handleDelegates = function(result) {
+
+  if (!result) {
+    return;
+  }
+
   var event = result[tapdaqNative.resultEvent];
 
   if (event === eventCallbacks.willDisplayInterstitial &&
-      that.willDisplayInterstitial) {
+      that.willDisplayInterstitial != null) {
         that.willDisplayInterstitial();
   }
 
   if (event === eventCallbacks.didDisplayInterstitial &&
-      that.didDisplayInterstitial) {
+      that.didDisplayInterstitial != null) {
         that.didDisplayInterstitial();
   }
 
   if (event === eventCallbacks.didFailToDisplayInterstitial &&
-      that.didFailToDisplayInterstitial) {
+      that.didFailToDisplayInterstitial != null) {
         that.didFailToDisplayInterstitial();
   }
 
   if (event === eventCallbacks.didCloseInterstitial &&
-      that.didCloseInterstitial) {
-        that.didCloseInterstitial();
-  }
-
-  if (event === eventCallbacks.didCloseInterstitial &&
-      that.didCloseInterstitial) {
+      that.didCloseInterstitial != null) {
         that.didCloseInterstitial();
   }
 
   if (event === eventCallbacks.didClickInterstitial &&
-      that.didClickInterstitial) {
+      that.didClickInterstitial != null) {
         that.didClickInterstitial();
   }
 
   if (event === eventCallbacks.didFailToFetchInterstitialsFromServer &&
-      that.didFailToFetchInterstitialsFromServer) {
+      that.didFailToFetchInterstitialsFromServer != null) {
         that.didFailToFetchInterstitialsFromServer();
   }
 
   if (event === eventCallbacks.hasNoInterstitialsAvailable &&
-      that.hasNoInterstitialsAvailable) {
+      that.hasNoInterstitialsAvailable != null) {
         that.hasNoInterstitialsAvailable();
   }
 
   if (event === eventCallbacks.hasInterstitialsAvailableForOrientation &&
-      that.hasInterstitialsAvailableForOrientation) {
+      that.hasInterstitialsAvailableForOrientation != null) {
         var orientation = result[tapdaqNative.resultMessage]['orientation'];
         that.hasInterstitialsAvailableForOrientation(orientation);
   }
