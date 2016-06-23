@@ -4,7 +4,9 @@
     "cordova_name": "Tapdaq",
     "description": "Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.",
     "keywords": [
-        "cordova",
+        "ecosystem:cordova",
+        "cordova-ios",
+        "cordova-android",
         "tapdaq",
         "ads",
         "advertising",
@@ -16,7 +18,8 @@
         "marketing"
     ],
     "platforms": [
-        "ios"
+        "ios",
+        "android"
     ],
     "engines": []
 }
