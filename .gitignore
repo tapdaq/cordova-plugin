@@ -12,9 +12,6 @@ platforms/ios/cordova/console.log
 *.xcuserdatad
 *.xcworkspace
 
-# iOS Lib
-src/ios/lib/
-
 # android
 platforms/android/assets/www
 platforms/android/bin
