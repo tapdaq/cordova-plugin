@@ -1,12 +1,12 @@
 /**
- Tapdaq Cordova Wrapper
- */
+Tapdaq Cordova Wrapper
+*/
 
 #import <Cordova/CDV.h>
 #import <Tapdaq/Tapdaq.h>
 
 
-static NSString *const kConfigTestAdvertsEnabled = @"testAdvertsEnabled";
+static NSString *const kConfigTestMode = @"testMode";
 static NSString *const kConfigTrackInstallsOnly = @"trackInstallsOnly";
 static NSString *const kConfigAdvertTypesEnabled = @"advertTypesEnabled";
 static NSString *const kConfigOrientation = @"orientation";
@@ -30,7 +30,7 @@ static NSString *const kEventValueDidFailToFetchInterstitialsFromServer = @"didF
 static NSString *const kEventValueHasNoInterstitialsAvailable = @"hasNoInterstitialsAvailable";
 static NSString *const kEventValueHasInterstitialsAvailableForOrientation = @"hasInterstitialsAvailableForOrientation";
 
-static NSString *const kEventMessage = @"event";
+static NSString *const kEventMessage = @"message";
 static NSString *const kEventMessageOrientation = @"orientation";
 
 
@@ -52,147 +52,145 @@ static NSString *const kEventMessageOrientation = @"orientation";
 
 - (void)setOptions:(CDVInvokedUrlCommand *)command
 {
-    self.properies = [[TDProperties alloc] init];
-    NSDictionary *config = (NSDictionary *)[command.arguments objectAtIndex:0];
+  self.properies = [[TDProperties alloc] init];
+  NSDictionary *config = (NSDictionary *)[command.arguments objectAtIndex:0];
 
-    if ([config objectForKey:kConfigTestAdvertsEnabled]) {
-        BOOL testAdvertsEnabled = [config objectForKey:kConfigTestAdvertsEnabled];
-        [self.properies setTestMode:testAdvertsEnabled];
+  if ([config objectForKey:kConfigTestMode]) {
+    BOOL testMode = [[config objectForKey:kConfigTestMode] boolValue];
+    [self.properies setTestMode:testMode];
+  }
+
+  if ([config objectForKey:kConfigOrientation]) {
+    NSString *orientation = [config objectForKey:kConfigOrientation];
+
+    orientation = [orientation lowercaseString];
+
+    if ([orientation isEqualToString:kOrientationUniversal]) {
+      [self.properies setOrientation:TDOrientationUniversal];
+    } else if ([orientation isEqualToString:kOrientationLandscape]) {
+      [self.properies setOrientation:TDOrientationLandscape];
+    } else if ([orientation isEqualToString:kOrientationPortrait]) {
+      [self.properies setOrientation:TDOrientationPortrait];
     }
+  }
 
-    if ([config objectForKey:kConfigOrientation]) {
-        NSString *orientation = [config objectForKey:kConfigOrientation];
+  if ([config objectForKey:kConfigTrackInstallsOnly]) {
+    BOOL trackInstallsOnly = [[config objectForKey:kConfigTrackInstallsOnly] boolValue];
 
-        orientation = [orientation lowercaseString];
-
-        if ([orientation isEqualToString:kOrientationUniversal]) {
-            [self.properies setOrientation:TDOrientationUniversal];
-        } else if ([orientation isEqualToString:kOrientationLandscape]) {
-            [self.properies setOrientation:TDOrientationLandscape];
-        } else if ([orientation isEqualToString:kOrientationPortrait]) {
-            [self.properies setOrientation:TDOrientationPortrait];
-        }
+    if (trackInstallsOnly) {
+      [self.properies setAdvertTypesToEnable:TDAdTypeNone];
     }
+  }
 
-    if ([config objectForKey:kConfigTrackInstallsOnly]) {
-        BOOL trackInstallsOnly = [config objectForKey:kConfigTrackInstallsOnly];
-
-        if (trackInstallsOnly) {
-            [self.properies setAdvertTypesToEnable:TDAdTypeNone];
-        }
-    }
-
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
 }
 
 - (void)init:(CDVInvokedUrlCommand *)command
 {
-    [self.commandDelegate runInBackground:^{
-        CDVPluginResult *pluginResult = nil;
+  [self.commandDelegate runInBackground:^{
+    CDVPluginResult *pluginResult = nil;
 
-        NSString *appId = [command.arguments objectAtIndex:0];
-        NSString *clientKey = [command.arguments objectAtIndex:1];
+    NSString *appId = [command.arguments objectAtIndex:0];
+    NSString *clientKey = [command.arguments objectAtIndex:1];
 
+    [self.properies setSdkIdentifierPrefix:kSdkIdentifierPrefix];
 
-        [self.properies setSdkIdentifierPrefix:kSdkIdentifierPrefix];
+    [[Tapdaq sharedSession] setApplicationId:appId clientKey:clientKey properties:self.properies];
+    [[Tapdaq sharedSession] launch];
+    [[Tapdaq sharedSession] setDelegate:self];
 
-        [[Tapdaq sharedSession] setApplicationId:appId clientKey:clientKey properties:self.properies];
-        [[Tapdaq sharedSession] launch];
-        [[Tapdaq sharedSession] setDelegate:self];
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    self.callbackId = command.callbackId;
 
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [pluginResult setKeepCallbackAsBool:YES];
-        self.callbackId = command.callbackId;
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+  }];
 }
 
 - (void)showInterstitial:(CDVInvokedUrlCommand *)command
 {
-    [[Tapdaq sharedSession] showInterstitial];
+  [[Tapdaq sharedSession] showInterstitial];
 
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 #pragma mark - Delegate methods
 
 - (void)willDisplayInterstitial
 {
-    [self sendEventWithEventValue:kEventValueWillDisplayInterstitial];
+  [self sendEventWithEventValue:kEventValueWillDisplayInterstitial];
 }
 
 - (void)didDisplayInterstitial
 {
-    [self sendEventWithEventValue:kEventValueDidDisplayInterstitial];
+  [self sendEventWithEventValue:kEventValueDidDisplayInterstitial];
 }
 
 - (void)didFailToDisplayInterstitial
 {
-    [self sendEventWithEventValue:kEventValueDidFailToDisplayInterstitial];
+  [self sendEventWithEventValue:kEventValueDidFailToDisplayInterstitial];
 }
 
 - (void)didCloseInterstitial
 {
-    [self sendEventWithEventValue:kEventValueDidCloseInterstitial];
+  [self sendEventWithEventValue:kEventValueDidCloseInterstitial];
 }
 
 - (void)didClickInterstitial
 {
-    [self sendEventWithEventValue:kEventValueDidClickInterstitial];
+  [self sendEventWithEventValue:kEventValueDidClickInterstitial];
 }
 
 - (void)didFailToFetchInterstitialsFromServer
 {
-    [self sendEventWithEventValue:kEventValueDidFailToFetchInterstitialsFromServer];
+  [self sendEventWithEventValue:kEventValueDidFailToFetchInterstitialsFromServer];
 }
 
 - (void)hasNoInterstitialsAvailable
 {
-    [self sendEventWithEventValue:kEventValueHasNoInterstitialsAvailable];
+  [self sendEventWithEventValue:kEventValueHasNoInterstitialsAvailable];
 }
 
 - (void)hasInterstitialsAvailableForOrientation:(TDOrientation)orientation
 {
-    NSString *orientationStr = kOrientationUniversal;
+  NSString *orientationStr = kOrientationUniversal;
 
-    if (orientation == TDOrientationPortrait) {
-        orientationStr = kOrientationPortrait;
-    } else if (orientation == TDOrientationLandscape) {
-        orientationStr = kOrientationLandscape;
-    }
+  if (orientation == TDOrientationPortrait) {
+    orientationStr = kOrientationPortrait;
+  } else if (orientation == TDOrientationLandscape) {
+    orientationStr = kOrientationLandscape;
+  }
 
-    NSDictionary *dict = @{
-                           kEventMessageOrientation: orientationStr
-                           };
+  NSDictionary *dict = @{
+    kEventMessageOrientation: orientationStr
+  };
 
-    [self sendEventWithEventValue:kEventValueHasInterstitialsAvailableForOrientation message:dict];
+  [self sendEventWithEventValue:kEventValueHasInterstitialsAvailableForOrientation message:dict];
 }
 
 #pragma mark - Private methods
 
 - (void)sendEventWithEventValue:(NSString *)eventValue
 {
-    NSDictionary *dict = @{
-                           kEventKey: eventValue
-                           };
-
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+  [self sendEventWithEventValue:eventValue message:nil];
 }
 
 - (void)sendEventWithEventValue:(NSString *)eventValue message:(NSDictionary *)message
 {
-    NSDictionary *dict = @{
-                           kEventKey: eventValue,
-                           kEventMessage: message
-                           };
+  NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
 
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+  [dict setObject:eventValue forKey:kEventKey];
+
+  if (message) {
+    [dict setObject:message forKey:kEventMessage];
+  }
+
+  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
+  [pluginResult setKeepCallbackAsBool:YES];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
 }
 
 @end
