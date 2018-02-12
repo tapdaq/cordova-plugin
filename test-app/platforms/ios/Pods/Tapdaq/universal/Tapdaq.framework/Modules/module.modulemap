@@ -1,0 +1,6 @@
+framework module Tapdaq {
+  umbrella header "Tapdaq.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq-ironsource" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq IronSource Adapter</name>
+    <description></description>
+    <keywords></keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <platform name="android">
+        <framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        </config-file>        
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- IronSource -->            
+            <activity
+                android:name="com.ironsource.sdk.controller.ControllerActivity"
+                android:configChanges="orientation|screenSize"
+                android:hardwareAccelerated="true" />
+            <activity
+                android:name="com.ironsource.sdk.controller.InterstitialActivity"
+                android:configChanges="orientation|screenSize"
+                android:hardwareAccelerated="true"
+                android:theme="@android:style/Theme.Translucent" />
+            <activity
+                android:name="com.ironsource.sdk.controller.OpenUrlActivity"
+                android:configChanges="orientation|screenSize"
+                android:hardwareAccelerated="true"
+                android:theme="@android:style/Theme.Translucent" />
+        </config-file>
+        <source-file src="src/android/TapdaqIronsourceAdapter.jar" target-dir="libs"/>
+    </platform>
+
+    <platform name="ios">                 
+        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
+        <framework src="TapdaqIronSourceAdapter" type="podspec" spec="~> 5.10.0" />          
+    </platform>
+</plugin>

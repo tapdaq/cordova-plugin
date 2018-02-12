@@ -1,0 +1,20 @@
+repositories {
+
+}
+
+android {
+    defaultConfig {
+        // Enabling multidex support.
+        multiDexEnabled true
+    }
+    dexOptions {
+        jumboMode true
+        incremental true
+	    javaMaxHeapSize "4g"
+        preDexLibraries = false
+    }
+}
+
+dependencies {
+     compile 'com.android.support:multidex:1.0.1'
+}

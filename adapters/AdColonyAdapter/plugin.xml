@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq-adcolony" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq AdColony Adapter</name>
+    <description></description>
+    <keywords></keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <platform name="android">
+		<framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
+		
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+		  <!-- AdColony Adapter -->
+		<activity android:name="com.adcolony.sdk.AdColonyInterstitialActivity"
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:hardwareAccelerated="true"/>
+
+		<activity android:name="com.adcolony.sdk.AdColonyAdViewActivity"
+			android:configChanges="keyboardHidden|orientation|screenSize"
+			android:hardwareAccelerated="true"/>		
+        </config-file>		
+		<source-file src="src/android/TapdaqAdColonyAdapter.jar" target-dir="libs"/>
+    </platform>
+
+    <platform name="ios">                 
+        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
+        <framework src="TapdaqAdColonyAdapter" type="podspec" spec="~> 5.10.0" />          
+    </platform>
+</plugin>

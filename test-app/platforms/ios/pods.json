@@ -1,0 +1,8 @@
+{
+    "Tapdaq": {
+        "name": "Tapdaq",
+        "type": "podspec",
+        "spec": "~> 5.10.0",
+        "count": 1
+    }
+}

@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq-hyprmx" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq HyprMX Adapter</name>
+    <description></description>
+    <keywords></keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <platform name="android">    
+        <framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">            
+            <!-- HyprMX Adapter -->
+            <activity android:name="com.tapdaq.adapters.TMHyprMXActivity"/>
+            <activity
+                android:name="com.hyprmx.android.sdk.activity.HyprMXOfferViewerActivity"
+                android:hardwareAccelerated="true"
+                android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+                android:label="HyprMX SDK"
+                android:launchMode="singleTop"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+            <activity
+                android:name="com.hyprmx.android.sdk.activity.HyprMXRequiredInformationActivity"
+                android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+            <activity
+                android:name="com.hyprmx.android.sdk.activity.HyprMXNoOffersActivity"
+                android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+            <activity
+                android:name="com.hyprmx.android.sdk.videoplayer.HyprMXVideoPlayerActivity"
+                android:hardwareAccelerated="true"
+                android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+        
+        </config-file>    
+        <source-file src="src/android/TapdaqHyprMXAdapter.jar" target-dir="libs"/>        
+        
+    </platform>
+
+    <platform name="ios">                 
+        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
+        <framework src="TapdaqHyprMXAdapter" type="podspec" spec="~> 5.10.0" />          
+    </platform>
+</plugin>

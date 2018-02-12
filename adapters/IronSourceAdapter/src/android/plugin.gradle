@@ -1,0 +1,9 @@
+repositories {   
+     //** IronSource */
+    maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" }
+}
+
+dependencies {     
+     // Required for IronSource
+     compile 'com.ironsource.sdk:mediationsdk:6.7.0.1@jar'
+}

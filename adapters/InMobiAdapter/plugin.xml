@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq-inmobi" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq InMobi Adapter</name>
+    <description></description>
+    <keywords></keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <platform name="android">        
+        <framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- InMobi Adapter -->
+            <activity
+                android:name="com.inmobi.rendering.InMobiAdActivity"
+                android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+                android:hardwareAccelerated="true"
+                android:resizeableActivity="false"
+                android:theme="@android:style/Theme.NoTitleBar" />
+
+            <receiver
+                android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
+                android:enabled="true"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="com.inmobi.share.id"/>
+                </intent-filter>
+            </receiver>
+        </config-file>    
+        <source-file src="src/android/TapdaqInmobiAdapter.jar" target-dir="libs"/>
+    </platform>
+
+    <platform name="ios">                 
+        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
+        <framework src="TapdaqInMobiAdapter" type="podspec" spec="~> 5.10.0" />          
+    </platform>
+</plugin>

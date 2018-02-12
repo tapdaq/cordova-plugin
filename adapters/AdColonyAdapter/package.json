@@ -1,0 +1,18 @@
+{
+  "name": "Tapdaq-AdColony-Cordova-Plugin",
+  "version": "5.10.0",
+  "description": "Tapdaq AdColony adapter for Apache Cordova",
+  "cordova": {
+    "id": "cordova-plugin-tapdaq-adcolony",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },    
+  "author": "Tapdaq",
+  "license": {
+    "type": "Commercial",
+    "url": "https://tapdaq.com/terms-and-conditions"
+  },
+  "homepage": "https://tapdaq.com"
+}
