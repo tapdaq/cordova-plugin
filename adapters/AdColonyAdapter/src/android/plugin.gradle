@@ -1,0 +1,7 @@
+repositories {
+    maven { url  "https://adcolony.bintray.com/AdColony" }
+}
+
+dependencies {
+     compile 'com.adcolony:sdk:3.3.0'
+}

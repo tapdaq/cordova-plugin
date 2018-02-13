@@ -1,0 +1,12 @@
+PODS:
+  - Tapdaq (5.10.0)
+
+DEPENDENCIES:
+  - Tapdaq (~> 5.10.0)
+
+SPEC CHECKSUMS:
+  Tapdaq: f93fb1079ec9d86b918a1acd149353fc669b8f1f
+
+PODFILE CHECKSUM: 9cb888c1ee0b2e7d3b8a2c60758ed3efe45431db
+
+COCOAPODS: 1.3.1

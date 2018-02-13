@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq-chartboost" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq Chartboost Adapter</name>
+    <description></description>
+    <keywords></keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <platform name="android">       
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  
+        </config-file>              
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">            
+        <!-- Chartboost Adapter -->                 
+          <activity
+            android:name="com.chartboost.sdk.CBImpressionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        </config-file>
+        <source-file src="src/android/TapdaqChartboostAdapter.jar" target-dir="libs"/>
+        <source-file src="src/android/libs/chartboost-7.0.1.jar" target-dir="libs" />
+    </platform>
+
+    <platform name="ios">                 
+        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
+        <framework src="TapdaqChartboostAdapter" type="podspec" spec="~> 5.10.0" />          
+    </platform>
+</plugin>

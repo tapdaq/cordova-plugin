@@ -1,85 +1,20 @@
-# Tapdaq Cordova Plugin
+# Cordova-Plugin
+Welcome to the community supported Tapdaq Cordova Plugin. This plugin is for iOS and Android targets only.
 
-Tapdaq's official plugin for Apache Cordova. The plugin supports iOS and Android.
+As of v3.0.0 the source code is now public in this repository, development of this plugin is open to the community and no longer officially supported by Tapdaq.
 
 ## Installation
+See our [quickstart](https://github.com/tapdaq/cordova-plugin/wiki/Quickstart) guide for instructions on how to integrate the SDK.
 
-```bash
-cordova plugin add https://github.com/tapdaq/cordova-plugin
-```
+## Development
+Source code for Tapdaq SDK is in sdk/ directory, all adapters can be found in adapters/ directory.
 
-## Quickstart
+## Contributing
+We welcome all improvements, please make a pull request with suggested changes and we will review it.
 
-To get started, sign up to Tapdaq and add your application.
-You will then be given an `appId` and `clientKey` under the app settings.
+Please update the documentation where possible when making changes to help fellow devs know whats changed.
 
-Once you have got those, add the following inside your app's `#onDeviceReady` method:
+## Support
+You should report any issues here on GitHub and the community may be able to help.
 
-```javascript    
-Tapdaq.setOptions({
-    testAdvertsEnabled: true # Set to false when submitting to the app store!
-});
-
-Tapdaq.init("YOUR_APP_ID", "YOUR_CLIENT_KEY");
-```
-
-Replace `YOUR_APP_ID` and `YOUR_CLIENT_KEY` with your real details.
-
-## Display an interstitial
-
-To get the most out of the Tapdaq community, we recommend you display an interstitial, like so:
-
-```javascript
-Tapdaq.showInterstitial();
-```
-
-## Additional settings
-
-The config object passed to `Tapdaq.setOptions()` contains the following options:
-
-```javascript
-{
-    testAdvertsEnabled: true|false, // sets the SDK to test mode, must be set to false when app is released
-    trackInstallsOnly: true|false, // turns off ad fetching, adverts will not display
-    orientation: "universal|portrait|landscape" // forces an orientation in the SDK
-}
-```
-
-### Example
-
-The following sets Tapdaq to test mode and forces the orientation to portrait.
-
-```javascript
- Tapdaq.setOptions({
-    testAdvertsEnabled: true,
-    orientation: "portrait"
-});
-```
-
-## Interstitial on bootup
-
-The following code demonstrates how to display an interstitial when the application first launches.
-
-```javascript
-  Tapdaq.setOptions({
-    testMode: true
-  });
-
-  Tapdaq.init('YOUR_APP_ID', 'YOUR_CLIENT_KEY');
-
-  var hasShownInterstitial = false;
-
-  Tapdaq.didCloseInterstitial = function() {
-    hasShownInterstitial = false;
-  }
-
-  Tapdaq.hasInterstitialsAvailableForOrientation = function(orientation) {
-
-    if (!hasShownInterstitial &&
-        orientation === 'portrait') {
-      Tapdaq.showInterstitial();
-      hasShownInterstitial = true;
-    }
-
-  }
-```
+Whilst Tapdaq does not officially support development of the plugin, if you have any questions about the iOS/Android SDK's then feel free to contact us on [support@tapdaq.com](mailto:support@tapdaq.com) and we will be more than happy to help.

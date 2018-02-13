@@ -1,0 +1,83 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+        "spec": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+        "type": "directory"
+      },
+      "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/test-app"
+    ]
+  ],
+  "_from": "../sdk",
+  "_id": "TapdaqCordovaPlugin@5.10.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/TapdaqCordovaPlugin",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+    "spec": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+    "type": "directory"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "file:../sdk",
+  "_shasum": "9c846ca64ab695a183fc364ff285d3fd6614f835",
+  "_shrinkwrap": null,
+  "_spec": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/sdk",
+  "_where": "/Volumes/Samsung_T5/Repositories/Tapdaq/cordova-sdk/test-app",
+  "author": {
+    "name": "Alexey Itsekson"
+  },
+  "bugs": {
+    "url": "https://github.com/tapdaq/cordova-sdk/issues"
+  },
+  "cordova": {
+    "id": "cordova-plugin-tapdaq",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "dependencies": {
+    "xcode": "^0.9.1"
+  },
+  "description": "Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.",
+  "devDependencies": {},
+  "homepage": "https://github.com/tapdaq/cordova-sdk#readme",
+  "keywords": [
+    "cordova",
+    "tapdaq",
+    "ads",
+    "advertising",
+    "promotion",
+    "cross",
+    "cross-promotion",
+    "retention",
+    "direct",
+    "marketing",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "ISC",
+  "name": "TapdaqCordovaPlugin",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tapdaq/cordova-sdk.git"
+  },
+  "version": "5.10.0"
+}

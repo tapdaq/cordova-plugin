@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-tapdaq" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Tapdaq</name>
+    <description>Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.</description>
+    <keywords>cordova,tapdaq,ads,advertising,promotion,cross,cross-promotion,retention,direct,marketing</keywords>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.4.0" />
+    </engines>
+
+    <js-module name="Tapdaq" src="www/Tapdaq.js">
+        <clobbers target="cordova.plugins.Tapdaq"/>
+    </js-module>
+    <js-module src="www/ads/Ad.js" name="ads.Ad" />
+    <js-module src="www/ads/MoreAppsAd.js" name="ads.MoreAppsAd" />
+    <js-module src="www/ads/NativeAd.js" name="ads.NativeAd" />
+    <js-module src="www/EventsBus.js" name="EventsBus" />
+    <js-module src="www/vendor/promise.js" name="vendor.promise" />
+    <js-module src="www/promise.js" name="Promise" />
+
+    <platform name="android">                
+        <framework src="com.google.code.gson:gson:2.4" />   
+        <framework src="com.android.support:appcompat-v7:27.0.2" />            
+        <framework src="com.google.android.gms:play-services-basement:11.8.0" />     
+        <framework src="com.google.android.gms:play-services-ads:11.8.0" />
+               
+        <hook type="before_compile" src="hooks/updateMultidexManifest.js" />
+        <hook type="after_platform_add" src="hooks/updateMultidexManifest.js" />
+
+        <framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
+
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="Tapdaq">
+                <param name="android-package" value="com.tapdaq.cordovasdk.CDVTapdaq"/>
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml">
+        
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+             
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <!-- Debug Views -->
+        <activity android:name="com.tapdaq.sdk.TMTestActivity" />
+        <activity android:name="com.tapdaq.sdk.TMTestNativeActivity"/>
+
+        <!-- Cross Promo -->
+        <activity android:name="com.tapdaq.sdk.TMInterstitialActivity" />
+        <activity android:name="com.tapdaq.sdk.TMVideoInterstitialActivity"/>
+        <!-- More Apps -->
+        <activity android:name="com.tapdaq.sdk.TMMoreAppsActivity"/>
+        
+
+        </config-file>
+        <source-file src="src/android/CDVTapdaq.java" target-dir="src/com/tapdaq/cordovasdk"/>
+        <source-file src="src/android/TapdaqHelper.java" target-dir="src/com/tapdaq/cordovasdk"/>
+        <source-file src="src/android/listeners/AdListener.java" target-dir="src/com/tapdaq/cordovasdk/listeners"/>
+        <source-file src="src/android/listeners/NativeAdListener.java" target-dir="src/com/tapdaq/cordovasdk/listeners"/>
+        <source-file src="src/android/enums/AdType.java" target-dir="src/com/tapdaq/cordovasdk/enums"/>           
+        
+        <source-file src="src/android/libs/tapdaq.jar" target-dir="libs" />       
+        
+    </platform>
+
+    <platform name="ios">               
+        <hook type="after_plugin_install" src="hooks/pod_install.js" />  
+        <!--<hook type="before_build" src="hooks/addEmbedded.js" /> -->
+        <config-file target="config.xml" parent="/*">
+            <feature name="Tapdaq">
+                <param name="ios-package" value="CDVTapdaq"/>
+                <param name="onload" value="true"/>
+            </feature>
+            
+        </config-file>
+        <config-file target="*-Info.plist" parent="LSApplicationQueriesSchemes">
+            <array>
+                <string>fb</string>
+                <string>instagram</string>
+                <string>tumblr</string>
+                <string>twitter</string>
+            </array>
+        </config-file>
+        
+       
+        
+        <!-- Wrapper files -->
+        <source-file src="src/ios/CDVTapdaq.m" />
+        <header-file src="src/ios/CDVTapdaq.h" />
+        <source-file src="src/ios/TapdaqMoreApps.m" />
+        <header-file src="src/ios/TapdaqMoreApps.h" />        
+
+        <!-- SDK -->
+        <framework src="Tapdaq" type="podspec" spec="~> 5.10.0" />          
+
+    </platform>
+</plugin>

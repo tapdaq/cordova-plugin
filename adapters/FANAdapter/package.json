@@ -1,0 +1,18 @@
+{
+  "name": "Tapdaq-FAN-Cordova-Plugin",
+  "version": "5.10.0",
+  "description": "Tapdaq FAN adapter for Apache Cordova",
+  "cordova": {
+    "id": "cordova-plugin-tapdaq-fan",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },    
+  "author": "Tapdaq",
+  "license": {
+    "type": "Commercial",
+    "url": "https://tapdaq.com/terms-and-conditions"
+  },
+  "homepage": "https://tapdaq.com"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Tapdaq-MoPub-Cordova-Plugin",
+  "version": "5.10.0",
+  "description": "Tapdaq MoPub adapter for Apache Cordova",
+  "cordova": {
+    "id": "cordova-plugin-tapdaq-mopub",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },    
+  "author": "Tapdaq",
+  "license": {
+    "type": "Commercial",
+    "url": "https://tapdaq.com/terms-and-conditions"
+  },
+  "homepage": "https://tapdaq.com"
+}
