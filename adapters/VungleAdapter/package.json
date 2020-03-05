@@ -1,6 +1,6 @@
 {
-  "name": "cordova-plugin-tapdaq-vungle",
-  "version": "7.4.0",
+  "name": "@tapdaq/cordova-vungle-adapter",
+  "version": "4.0.0",
   "description": "Tapdaq Vungle adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-vungle",
@@ -9,7 +9,33 @@
       "ios"
     ]
   },    
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tapdaq/cordova-plugin.git",
+    "directory": "adapters/VungleAdapter"
+  },
+  "keywords": [
+    "cordova",
+    "tapdaq",
+    "vungle",
+    "ads",
+    "advertising",
+    "mobile",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=8.0.0"
+    },
+    {
+      "name": "cordova-ios",
+      "version": ">=5.0.0"
+    }
+  ],
   "author": "Tapdaq",
-  "license":  "Commercial",
+  "license": "Commercial",
   "homepage": "https://tapdaq.com"
 }

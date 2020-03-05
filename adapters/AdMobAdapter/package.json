@@ -1,6 +1,6 @@
 {
-  "name": "cordova-plugin-tapdaq-admob",
-  "version": "7.4.0",
+  "name": "@tapdaq/cordova-admob-adapter",
+  "version": "4.0.0",
   "description": "Tapdaq AdMob adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-admob",
@@ -9,6 +9,32 @@
       "ios"
     ]
   },    
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tapdaq/cordova-plugin.git",
+    "directory": "adapters/AdMobAdapter"
+  },
+  "keywords": [
+    "cordova",
+    "tapdaq",
+    "admob",
+    "ads",
+    "advertising",
+    "mobile",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=8.0.0"
+    },
+    {
+      "name": "cordova-ios",
+      "version": ">=5.0.0"
+    }
+  ],
   "author": "Tapdaq",
   "license": "Commercial",
   "homepage": "https://tapdaq.com"
