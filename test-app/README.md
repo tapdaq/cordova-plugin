@@ -3,7 +3,7 @@
 ```bash
 npm install -g cordova
 cordova platform add android
-cordova plugin add https://github.com/tapdaq/cordova-sdk.git 
+cordova plugin add https://github.com/tapdaq/cordova-plugin.git 
 ```
 
 File `www/js/index.js` contains example of plugin usage

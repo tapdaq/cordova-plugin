@@ -1,7 +1,7 @@
 {
-  "name": "cordova-plugin-tapdaq",
-  "version": "7.5.0",
-  "description": "Tapdaq is a cross promotion tool for mobile apps. We help you to retain users across your app portfolio and to trade installs with other developers.",
+  "name": "@tapdaq/cordova-sdk",
+  "version": "4.0.0",
+  "description": "Tapdaq SDK for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq",
     "platforms": [
@@ -11,30 +11,30 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tapdaq/cordova-sdk.git"
+    "url": "git+https://github.com/tapdaq/cordova-plugin.git",
+    "directory": "sdk"
   },
   "keywords": [
     "cordova",
     "tapdaq",
     "ads",
     "advertising",
-    "promotion",
-    "cross",
-    "cross-promotion",
-    "retention",
-    "direct",
-    "marketing",
+    "mobile",
     "ecosystem:cordova",
     "cordova-android",
     "cordova-ios"
   ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=8.0.0"
+    },
+    {
+      "name": "cordova-ios",
+      "version": ">=5.0.0"
+    }
+  ],
   "author": "Tapdaq",
   "license": "Commercial",
-  "bugs": {
-    "url": "https://github.com/tapdaq/cordova-plugin/issues"
-  },
-  "homepage": "https://github.com/tapdaq/cordova-plugin#readme",
-  "dependencies": {
-    "xcode": "^0.9.1"
-  }
+  "homepage": "https://tapdaq.com"
 }
