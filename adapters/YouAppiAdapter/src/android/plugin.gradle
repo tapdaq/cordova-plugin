@@ -1,0 +1,11 @@
+repositories {
+    google()
+    jcenter()
+
+    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "http://repository.youappi.com/repository/release" }
+}
+
+dependencies {
+    implementation 'com.tapdaq.sdk:TapdaqYouAppiAdapter:7.5.1'
+}

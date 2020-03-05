@@ -1,0 +1,15 @@
+repositories {
+    google()
+    jcenter()
+
+    maven { url "http://android-sdk.tapdaq.com" }
+
+    maven {
+      name "Tapjoy's maven repo"
+      url "https://tapjoy.bintray.com/maven"
+    }
+}
+
+dependencies {
+    implementation 'com.tapdaq.sdk:TapdaqTapjoyAdapter:7.5.1'
+}

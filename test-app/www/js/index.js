@@ -17,7 +17,6 @@
  * under the License.
  */
 var app = {
-    tapdaq: null,
     // Application Constructor
     initialize: function () {
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
@@ -29,394 +28,342 @@ var app = {
     // 'pause', 'resume', etc.
     onDeviceReady: function () { 
         this.receivedEvent('deviceready');
-        var loadedAds = [];
 
-        this.tapdaq = Tapdaq = cordova.require("cordova-plugin-tapdaq.Tapdaq");
-        var Ad = cordova.require("cordova-plugin-tapdaq.ads.Ad");
-        var MoreAppsAd = cordova.require("cordova-plugin-tapdaq.ads.MoreAppsAd");  
-        var NativeAd = cordova.require("cordova-plugin-tapdaq.ads.NativeAd");
+        var placementTagField = $('#placement-tag-field');
+        var placementTag = placementTagField.val(); 
+        placementTagField.on('change', function() {
+            placementTag = $(this).val();
+        });
 
-        var options = {
+        var placementTagForm = $('#placement-tag-form');
+        placementTagForm.on('submit', function(e) {
+            e.preventDefault();
+        });
+
+        var bannerPositionOptions = $('#bannerPositionMenu ul li a');
+        var bannerPosition = "";
+        bannerPositionOptions.on('click', function(e) {
+            e.preventDefault();
+            bannerPosition = $(this).data('value');
+        });
+
+        var bannerSizeOptions = $('#bannerSizeMenu ul li a');
+        var bannerSize = "";
+        bannerSizeOptions.on('click', function(e) {
+            e.preventDefault();
+            bannerSize = $(this).data('value');
+        });
+
+        var bannerWidthField = $('#banner-width');
+        var bannerWidth = bannerWidthField.val();
+        bannerWidthField.on('change', function() {
+            bannerWidth = parseFloat($(this).val());
+        })
+
+        var bannerHeightField = $('#banner-height');
+        var bannerHeight = bannerHeightField.val();
+        bannerHeightField.on('change', function() {
+            bannerHeight = parseFloat($(this).val());
+        })
+
+        var bannerXField = $('#banner-x');
+        var bannerX = bannerXField.val();
+        bannerXField.on('change', function() {
+            bannerX = parseFloat($(this).val());
+        })
+
+        var bannerYField = $('#banner-y');
+        var bannerY = bannerYField.val();
+        bannerYField.on('change', function() {
+            bannerY = parseFloat($(this).val());
+        })
+
+        const Tapdaq = cordova.require("cordova-plugin-tapdaq.Tapdaq");
+
+        // Tapdaq.setUserSubjectToGDPR(Tapdaq.Status.TRUE);
+        // Tapdaq.setConsent(Tapdaq.Status.TRUE);
+        // Tapdaq.setAgeRestrictedUser(Tapdaq.Status.FALSE);
+        // Tapdaq.setAdMobContentRating("MA")
+        //
+        // Tapdaq.setForwardUserId(true);
+        // Tapdaq.setUserId("Cordova User");
+
+        Tapdaq.userSubjectToGDPRStatus(function (status) {
+            console.log("userSubjectToGDPRStatus: " + status);
+        });
+
+        Tapdaq.consentStatus(function (status) {
+            console.log("consentStatus: " + status);
+        });
+
+        Tapdaq.ageRestrictedUserStatus(function (status) {
+            console.log("ageRestrictedUserStatus: " + status);
+        });
+
+        Tapdaq.adMobContentRating(function (status) {
+            console.log("adMobContentRating: " + status);
+        });
+
+        Tapdaq.forwardUserId(function (status) {
+            console.log("forwardUserId: " + status);
+        });
+
+        Tapdaq.userId(function (status) {
+            console.log("userId: " + status);
+        });
+
+        var config = {
             ios: {
-                appId: "",
-                clientKey: "",
+                appId: "<iOS_APP_ID>",
+                clientKey: "<IOS_CLIENT_KEY>",
                 testDevices: [
                     {
-                        network: Tapdaq.AdNetworks.AdMob,
+                        network: Tapdaq.AdNetwork.AdMob,
                         devices: [
-                            ""
+                            "<ADMOB_TEST_DEVICE_ID>"
                         ]
                     },
                     {
-                        network: Tapdaq.AdNetworks.FacebookAN,
+                        network: Tapdaq.AdNetwork.FacebookAN,
                         devices: [
-                            ""
+                            "<FAN_TEST_DEVICE_ID>"
                         ]
                     }
                 ] 
             },
             android: {
-                appId: "",
-                clientKey: "",
+                appId: "ANDROID_APP_ID",
+                clientKey: "ANDROID_CLIENT_KEY",
                 testDevices: [
                     {
-                        network: Tapdaq.AdNetworks.AdMob, 
+                        network: Tapdaq.AdNetwork.AdMob,
                         devices: [
-                             ""                          
+                            "ADMOB_TEST_DEVICE_ID"
                         ]
-                    },{ 
-                        network: Tapdaq.AdNetworks.FacebookAN, 
-                        devices: [                            
-                            ""
+                    },
+                    {
+                        network: Tapdaq.AdNetwork.FacebookAN,
+                        devices: [
+                            "FAN_TEST_DEVICE_ID"
                         ]
-                    }                    
-                ]
-                
-            },
-            enabledPlacements: [
-                 {
-                    adType: Ad.AdTypes.INTERSTITIAL,
-                    tags: ["main_menu"]
-                },{
-                    adType: Ad.AdTypes.VIDEO,
-                    tags: ["main_menu"]
-                },{
-                    adType: Ad.AdTypes.REWARDED_VIDEO,
-                    tags: ["main_menu"]
-                },{
-                    adType: Ad.AdTypes.BANNER,
-                    size: Ad.AdBannerSizes.STANDARD,
-                    position: Ad.AdBannerPositions.BOTTOM,
-                    tags: []
-                },{
-                    adType: Ad.AdTypes.OFFERWALL,
-                    tags: ["default"]
-                },{
-                    adType: Ad.AdTypes.MORE_APPS,  
-                    tags: ["tray-position-1", "tray-position-2", "tray-position-3", "tray-position-4", "tray-position-5", "tray-position-backfill"],                  
-                    options: {
-                        [MoreAppsAd.OptionNames.HeaderText]: "Some Header",
-                        [MoreAppsAd.OptionNames.HeaderColor]: "#eeeeee",
-                        [MoreAppsAd.OptionNames.HeaderTextColor]: "#ff0000",
-                        [MoreAppsAd.OptionNames.AppButtonColor]: "#0000ee",
                     }
-                },{
-                    adType: NativeAd.AdTypes.AdType1x1Large,
-                    tags: ["default"]
-                }
-            ],
-            frequencyCap: 2,
-            durationInDays: 1,
-            debugMode: true,
-			autoReload: true
+                ]
+            }
+            // ,
+            // userId:"Demo User",
+            // forwardUserId:false,
+            // logLevel: Tapdaq.LogLevel.Debug,
+            // userSubjectToGDPR:Tapdaq.Status.UNKNOWN,
+            // isConsentGiven:Tapdaq.Status.FALSE,
+            // isAgeRestrictedUser: Tapdaq.Status.TRUE,
+            // adMobContentRating: Tapdaq.AdMobContentRating.G
         };
+        
+        const loadOpts = {
+            didLoad: function (response) {
+                console.log('didLoad: ' + JSON.stringify(response));
+            },
+            didFailToLoad: function (error, response) {
+                console.log('didFailToLoad: error: ' + JSON.stringify(error) + ', response: ' + JSON.stringify(response));
+            }
+        }
+        const showOpts = {
+            willDisplay: function(response) {
+                console.log('willDisplay: ' + JSON.stringify(response));
+            },
+            didDisplay: function(response) {
+                console.log('didDisplay: ' + JSON.stringify(response));
+            },
+            didFailToDisplay: function(error, response) {
+                console.log('didFailToDisplay: error: ' + JSON.stringify(error) + ', response: ' + JSON.stringify(response));
+            },
+            didClose: function(response) {
+                console.log('didClose: ' + JSON.stringify(response));
+            },
+            didClick: function(response) {
+                console.log('didClick: ' + JSON.stringify(response));
+            }, 
+            didValidateReward: function(response) {
+                console.log('didValidateReward: ' + JSON.stringify(response));
+            }
+        };
+        const bannerOpts = {
+            didLoad: function (response) {
+                console.log('didLoad: ' + JSON.stringify(response));
+            },
+            didFailToLoad: function (error, response) {
+                console.log('didFailToLoad: error: ' + JSON.stringify(error) + ', response: ' + JSON.stringify(response));
+            },
+            didRefresh: function (response) {
+                console.log('didRefresh: ' + JSON.stringify(response));
+            },
+            didFailToRefresh: function (error, response) {
+                console.log('didFailToRefresh: error: ' + JSON.stringify(error) + ', response: ' + JSON.stringify(response));
+            },
+            didClick: function(response) {
+                console.log('didClick: ' + JSON.stringify(response));
+            }
+        }
 
-        var _this = this;
-        $('.btn').prop("disabled", true);
+        var allBtns = $('.btn');
+        allBtns.prop("disabled", true);
 
         var initBtn = $("#init-sdk-btn");
-        //var loadBtn = $("#load-ads-btn");
         
         var loadInterBtn = $("#load-interstitial-btn");
-        var loadBannerBtn = $("#load-banner-btn");        
         var loadVideoBtn = $("#load-video-btn");
         var loadVideoRewardBtn = $("#load-video-reward-btn");
-		var loadOfferwallBtn = $("#load-offerwall-btn");
-        var loadMoreAppsBtn = $("#load-moreapps-btn");
-        var loadNativeBtn = $("#load-native-btn");
+        var loadBannerBtn = $('#load-banner-btn');
         
         var showInterBtn = $("#show-interstitial-btn");
-        var showBannerBtn = $("#show-banner-btn");
-        var hideBannerBtn = $("#hide-banner-btn");
-		var bannerSizeSelect = $("#banner-size-select");
-		bannerSizeSelect.combobox();
-		bannerSizeSelect.on("change", function(){
-			showBannerBtn.prop("disabled", true);
-			hideBannerBtn.prop("disabled", true);
-		});
         var showVideoBtn = $("#show-video-btn");
         var showVideoRewardBtn = $("#show-video-reward-btn");
-		var showOfferwallBtn = $("#show-offerwall-btn");
-        var showMoreappsBtn = $("#show-moreapps-btn");
-        var showNativeBtn = $("#show-native-btn");
+        var showBannerBtn = $('#show-banner-btn');
+
+        var hideBannerBtn = $('#hide-banner-btn');
+        var destroyBannerBtn = $('#destroy-banner-btn');
+
         var mediationDebugBtn = $("#show-mediation-debug-btn");
-        
-        var toggleButton = function(adType, isEnabled) {
-            var btn = null;
 
-            console.log("adType: " + adType + ", isEnabled: " + isEnabled);
-
-            switch (adType) {
-                case Ad.AdTypes.INTERSTITIAL:
-                    btn = showInterBtn;
-                    break;
-                case Ad.AdTypes.BANNER:
-                    btn = showBannerBtn;
-                    break;
-                case Ad.AdTypes.VIDEO:
-                    btn = showVideoBtn;
-                    break;
-                case Ad.AdTypes.REWARDED_VIDEO:
-                    btn = showVideoRewardBtn;
-                    break;
-				case Ad.AdTypes.OFFERWALL:
-                    btn = showOfferwallBtn;
-                    break;
-                case Ad.AdTypes.MORE_APPS:
-                    btn = showMoreappsBtn;
-                    break;
-                default: btn = showNativeBtn;
-            }
-
-            btn.prop("disabled", !isEnabled);
-        }
-
-        var eventHandler = function (e) {
-            var ad = e.target;
-			console.log(e.type, e.target.getType());
-            if (e.type == Ad.events.didLoad || 
-                    e.type == Ad.events.didFailToLoad || 
-                    e.type == Ad.events.didClose) {
-                var toggleShowButton = e.type == Ad.events.didLoad;
-                toggleButton(ad.getType(), toggleShowButton);
-            }
-        }
-
-        // Handler for new Ad created callback
-        var createdHandler = function (ad) {
-            // new Ad created
-            // check whether ad ready or not
-            ad.isReady().then(function(res){
-                console.log(ad.getType() + "- isReady? ", res);
-            }).catch(function(err){
-                console.warn(err);
-            })
-
-            // also here we can subscribe to some related events
-            ad.on(Ad.events.didLoad, eventHandler);
-             // also here we can subscribe to some related events
-            ad.on(Ad.events.didFailToLoad, eventHandler);
-            // also here we can subscribe to some related events
-            ad.on(Ad.events.willDisplay, eventHandler);
-            ad.on(Ad.events.didDisplay, eventHandler);
-            ad.on(Ad.events.didClose, eventHandler);
-            ad.on(Ad.events.didClick, eventHandler);
-            ad.on(Ad.events.didVerify, eventHandler);
-            ad.on(Ad.events.didRewardFail, eventHandler);
-            ad.on(Ad.events.didComplete, eventHandler);
-
-            var sizeOrOptions = null;
-            if(ad.getType() == Ad.AdTypes.BANNER){
-                sizeOrOptions = Ad.AdBannerSizes.STANDARD;
-            }else  if(ad.getType() == Ad.AdTypes.MORE_APPS){                
-                placement = options.enabledPlacements.find(function(placement){
-                    return placement.adType == Ad.AdTypes.MORE_APPS;
-                });
-                sizeOrOptions = placement.options;
-            }
-            // load Ad
-            ad.load(sizeOrOptions);
-            // persist ads to enable/disable buttons
-            loadedAds.push(ad);
-            
-            if(ad.getType() == Ad.AdTypes.NATIVE_AD){
-               $(".close-btn").prop("disabled", false).on("click", function(){
-                    ad.hide();
-                }); 
-            }
-        };
         
         // init click events for buttons
-        initBtn.on("click", function (e) {
-            console.log("SDK initialization...");
+        initBtn.on("click", function(e) {
+            e.preventDefault();
+
             initBtn.prop("disabled", true);
             
             // init SDK
-            Tapdaq.init(options).then(function () {
 
-                // alternative way to subscribe to Ad's lifecicle events
-                Tapdaq.on(Ad.events.didLoad, eventHandler);
-                Tapdaq.on(Ad.events.didFailToLoad, eventHandler);
-                Tapdaq.on(Ad.events.didClick, eventHandler);
-                Tapdaq.on(Ad.events.didDisplay, eventHandler);
-                Tapdaq.on(Ad.events.didClose, eventHandler);
-                Tapdaq.on(Ad.events.didVerify, eventHandler);
-                Tapdaq.on(Ad.events.didRewardFail, eventHandler);
+            var opts = {
+                didInitialise: function() {
+                    console.log('cb: didInitialise');
+                    allBtns.prop("disabled", false);
+                },
+                didFailToInitialise: function(error) {
+                    console.log('cb: didFailToInitialise: ' + JSON.stringify(error));
+                }
+            };
 
-                // all stuff is initialized and ready to load
-                console.log("Tapdaq SDK is initialized and ready to load ads");
-                $('.load-btn, .debug-btn').prop("disabled", false);
-            });
+            Tapdaq.init(config, opts);
         });
+
         initBtn.prop("disabled", false);
+        mediationDebugBtn.prop("disabled", false);
         
+        // Interstitial
 
-        // load AdTypeInterstitial
-        loadInterBtn.on("click", function (e) {
-            //Tapdaq.createAd(Ad.AdTypes.INTERSTITIAL).forTag("bootup").then(createdHandler);
-            Tapdaq.loadAd(Ad.AdTypes.INTERSTITIAL, "main_menu"); // alternative way to load Ad
-        });
-        
-        // load AdTypeBanner
-        loadBannerBtn.on("click", function (e) {
-            //Tapdaq.createAd(Ad.AdTypes.BANNER).forSize(Ad.AdBannerSizes.SMART).then(createdHandler);
-			var size = bannerSizeSelect.val() || Ad.AdBannerSizes.STANDARD;
-			console.log("Banner size: " + size);
-            Tapdaq.loadAd(Ad.AdTypes.BANNER, Ad.AdBannerPositions.BOTTOM, size); // alternative way to load Ad
-			
-			showBannerBtn.prop("disabled", false);
-			hideBannerBtn.prop("disabled", false);
-        });
-        // load AdTypeVideo
-        loadVideoBtn.on("click", function (e) {
-           // Tapdaq.createAd(Ad.AdTypes.VIDEO).forTag("main_menu").then(createdHandler);
-           Tapdaq.loadAd(Ad.AdTypes.VIDEO, "main_menu"); // alternative way to load Ad
-        });
-        
-        // load AdTypeVideoReward
-        loadVideoRewardBtn.on("click", function (e) {
-            //Tapdaq.createAd(Ad.AdTypes.REWARDED_VIDEO).forTag("bootup").then(createdHandler);
-            Tapdaq.loadAd(Ad.AdTypes.REWARDED_VIDEO, "main_menu"); // alternative way to load Ad
-        });
-        
-         // load AdTypeNative
-        loadNativeBtn.on("click", function (e) {            
-            // Example of usage of NativeAd
-            var adContainer = document.querySelector(".native-ad-container");
-            
-            var nativeAdOptions = options.enabledPlacements[options.enabledPlacements.length - 1];
-        
-            Tapdaq.createNativeAd(nativeAdOptions.adType)
-                .forTag(nativeAdOptions.tags[0])
-                .withContainer(adContainer).then(createdHandler);
-                
-          /*  Tapdaq.loadAd(nativeAdOptions.adType, nativeAdOptions.tags[0], {
-                container: adContainer,
-                clickElement: clickBtn
-            }); // alternative way to load Ad*/
-        });
-		
-        
-		 // load AdTypeOfferWall
-        loadOfferwallBtn.on("click", function (e) {
-            Tapdaq.createAd(Ad.AdTypes.OFFERWALL).then(createdHandler); // create offerwall Ad for default tag
-            //Tapdaq.loadAd(Ad.AdTypes.OFFERWALL); // alternative way to load Ad
-        });
-		
-          
-		 // load AdTypeMoreApps
-        loadMoreAppsBtn.on("click", function (e) {
-           // Tapdaq.createAd(Ad.AdTypes.MORE_APPS).then(createdHandler); // create MoreApps Ad with default options, we can set options later, pass them to .load method
-            
-            var placement = options.enabledPlacements.find(function(placement){
-                return placement.adType == Ad.AdTypes.MORE_APPS;
-            });
-            var opts = placement.options;
-            Tapdaq.loadAd(Ad.AdTypes.MORE_APPS, opts); // alternative way to load Ad
-        });
-        
-        mediationDebugBtn.on("click", function(e){
+        loadInterBtn.on("click", function(e) {
             e.preventDefault();
-            Tapdaq.showDebugPanel();
+            Tapdaq.loadInterstitial(placementTag, loadOpts);
         });
-        
-        showInterBtn.on("click", function (e) {
-            Tapdaq.showAd(Ad.AdTypes.INTERSTITIAL, "main_menu"); // if ad hasn't loaded yet then didFailToLoad event will be triggered
-            
-           /* loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.INTERSTITIAL) {
-                    ad.show();
-                    showInterBtn.prop("disabled", true);
-                }
-            })*/
-        });
-        showBannerBtn.on("click", function (e) {
-             Tapdaq.showAd(Ad.AdTypes.BANNER, Ad.AdBannerPositions.BOTTOM);
-              $(showBannerBtn).addClass("hidden");
-              $(hideBannerBtn).removeClass("hidden");
-              $(hideBannerBtn).prop("disabled", false);
-            /*loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.BANNER) {
-                    ad.show();
-                    $(showBannerBtn).addClass("hidden");
-                    $(hideBannerBtn).removeClass("hidden");
-                    $(hideBannerBtn).prop("disabled", false);
-                }
-            })*/
-        });
-        hideBannerBtn.on("click", function (e) {
-             Tapdaq.hideBanner(Ad.AdBannerPositions.BOTTOM);
-             $(showBannerBtn).removeClass("hidden");
-             $(hideBannerBtn).addClass("hidden");
-            /*loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.BANNER) {
-                    ad.hide();
-                    $(showBannerBtn).removeClass("hidden");
-                    $(hideBannerBtn).addClass("hidden");
-                }
-            })*/
-        });
-        showVideoBtn.on("click", function (e) {
-            Tapdaq.showAd(Ad.AdTypes.VIDEO, "main_menu");
-           /* loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.VIDEO) {
-                    ad.show();
-                    showVideoBtn.prop("disabled", true);
-                }
-            })*/
-        });
-        showVideoRewardBtn.on("click", function (e) {
-            Tapdaq.showAd(Ad.AdTypes.REWARDED_VIDEO, "main_menu");
-            /*loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.REWARDED_VIDEO) {
-                    ad.show();
-                    showVideoRewardBtn.prop("disabled", true);
-                }
-            })*/
-        });
-		showOfferwallBtn.on("click", function (e) {
-           // Tapdaq.showAd(Ad.AdTypes.OFFERWALL);
-            loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.OFFERWALL) {
-                    ad.show();
-                    showOfferwallBtn.prop("disabled", true);
-                }
-              });
-        });
-        
-        showMoreappsBtn.on("click", function (e) {
-            var ad = Tapdaq.showAd(Ad.AdTypes.MORE_APPS);
-            ad.on(Ad.events.didDisplay, function(){
-                showMoreappsBtn.prop("disabled", true);
-            })
-            /*loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.MORE_APPS) {
-                    ad.show();
-                    showMoreappsBtn.prop("disabled", true);
-                }
-              });*/
-        });
-        
-        showNativeBtn.on("click", function (e) {
-           var nativeAdOptions = options.enabledPlacements[options.enabledPlacements.length - 1];
-        
-            loadedAds.forEach(function (ad) {
-                if (ad.getType() == Ad.AdTypes.NATIVE_AD) {
-                    ad.show();
-                    showNativeBtn.prop("disabled", true);
-                }
-              });
-              //Tapdaq.showAd(nativeAdOptions.adType, nativeAdOptions.tags[0]);// alternative way
-        });
-        
-        
 
+        showInterBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.isInterstitialReady(placementTag, function (e) {
+               console.log("isInterstitialReady - " + placementTag + " - " + e);
+            });
+            Tapdaq.showInterstitial(placementTag, showOpts);
+        });
+
+        // Video
+        
+        loadVideoBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.loadVideo(placementTag, loadOpts);
+        });
+
+        showVideoBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.isVideoReady(placementTag, function (e) {
+                console.log("isVideoReady - " + placementTag + " - " + e);
+            });
+            Tapdaq.showVideo(placementTag, showOpts);
+        });
+        
+        // Rewarded Video
+
+        loadVideoRewardBtn.on("click", function(e) {
+            e.preventDefault();
+
+            Tapdaq.loadRewardedVideo(placementTag, loadOpts);
+        });
+        
+        showVideoRewardBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.isRewardedVideoReady(placementTag, function (e) {
+                console.log("isRewardedVideoReady - " + placementTag + " - " + e);
+            });
+            Tapdaq.showRewardedVideo(placementTag, showOpts);
+        });
+
+        // Banner
+
+        loadBannerBtn.on("click", function(e) {
+            e.preventDefault();
+
+            if (bannerSize === "custom") {
+                const customSize = { width: bannerWidth, height: bannerHeight };
+                Tapdaq.loadBanner(placementTag, customSize, bannerOpts);
+            } else {
+                Tapdaq.loadBanner(placementTag, bannerSize, bannerOpts);
+            }
+        });
+
+        showBannerBtn.on("click", function(e) {
+            e.preventDefault();
+
+            Tapdaq.isBannerReady(placementTag, function (e) {
+                console.log("isBannerReady - " + placementTag + " - " + e);
+            });
+
+            if (bannerPosition === "custom") {
+                const customPosition = { x: bannerX, y: bannerY };
+                Tapdaq.showBanner(placementTag, customPosition);
+            } else {
+                Tapdaq.showBanner(placementTag, bannerPosition);
+            }
+
+        });
+
+        hideBannerBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.hideBanner(placementTag);
+        });
+
+        destroyBannerBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.destroyBanner(placementTag);
+        })
+
+        mediationDebugBtn.on("click", function(e) {
+            e.preventDefault();
+            Tapdaq.launchDebugger();
+
+
+        });
     },
 
     // Update DOM on a Received Event
     receivedEvent: function (id) {
         console.log('Received Event: ' + id);
+
+
     }
 };
 
 app.initialize();
+
+
+
+$('.dropdown ul li a').on('click', function(e) {
+    e.preventDefault();
+    const optionText = $(this).text();
+    
+    const button = $(this).closest('.dropdown').find('.dropdown-toggle');
+    if (button.length) {
+        button.html(optionText + ' <span class="caret"></span>');
+    } 
+
+    const customInputs = $('.' + button.data('customtag'));
+    customInputs.prop('disabled', optionText !== 'Custom');
+});

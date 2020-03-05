@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-tapdaq-vungle" version="5.10.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-plugin-tapdaq-vungle" version="7.5.1" xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <name>Tapdaq Vungle Adapter</name>
@@ -7,27 +7,23 @@
     <keywords></keywords>
 
     <engines>
-        <engine name="cordova-android" version=">=6.0.0" />
-        <engine name="cordova-ios" version=">=4.4.0" />
+        <engine name="cordova-android" version=">=8.0.0" />
+        <engine name="cordova-ios" version=">=5.0.0" />
     </engines>
 
-    <platform name="android">    
-        <framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>            
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">    
-        <!-- Vungle Adapter -->
-            <activity android:name="com.vungle.publisher.VideoFullScreenAdActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"/>
-
-            <activity android:name="com.vungle.publisher.MraidFullScreenAdActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
-
-        </config-file>
-        <source-file src="src/android/TapdaqVungleAdapter.jar" target-dir="libs"/>      
+    <platform name="android">
+		<framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
     </platform>
 
-    <platform name="ios">                 
-        <hook type="after_plugin_install" src="hooks/pod_install.js" /> 
-        <framework src="TapdaqVungleAdapter" type="podspec" spec="~> 5.10.0" />          
+    <platform name="ios">               
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git" />
+                <source url="https://github.com/tapdaq/cocoapods-specs.git" />
+            </config>
+            <pods use-frameworks="true">
+                <pod name="Tapdaq/Vungle" spec="~> 7.5.1" />
+            </pods>
+        </podspec>
     </platform>
 </plugin>

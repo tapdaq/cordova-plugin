@@ -4,6 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
 
+## 4.0.0 (2020-03-05)
+- Major rebuild of plugin, refactoring the interface
+- Tapdaq iOS SDK 7.5.1 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
+- Tapdaq Android SDK 7.5.1 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Added support for Maio, Mintegral, TikTok (iOS), YouAppi & ZPlay
+- Removed support for HyprMX, MoPub, Receptiv
+- GDPR/COPPA Support
+- Cordova-android minimum support now 8.0.0
+- Cordova-ios minimum support now 5.0.1
+
 ## 3.0.0 (2018-02-12)
 - Major rebuild of plugin
 - Tapdaq iOS SDK 5.10.0 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)

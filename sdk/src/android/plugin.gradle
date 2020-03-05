@@ -1,20 +1,10 @@
 repositories {
+    google()
+    jcenter()
 
-}
-
-android {
-    defaultConfig {
-        // Enabling multidex support.
-        multiDexEnabled true
-    }
-    dexOptions {
-        jumboMode true
-        incremental true
-	    javaMaxHeapSize "4g"
-        preDexLibraries = false
-    }
+    maven { url "http://android-sdk.tapdaq.com" }
 }
 
 dependencies {
-     compile 'com.android.support:multidex:1.0.1'
+    implementation 'com.tapdaq.sdk:Tapdaq-BaseSDK:7.5.1'
 }

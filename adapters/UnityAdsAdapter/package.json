@@ -1,6 +1,6 @@
 {
-  "name": "Tapdaq-UnityAds-Cordova-Plugin",
-  "version": "5.10.0",
+  "name": "cordova-plugin-tapdaq-unityads",
+  "version": "7.4.0",
   "description": "Tapdaq UnityAds adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-unityads",
@@ -10,9 +10,6 @@
     ]
   },    
   "author": "Tapdaq",
-  "license": {
-    "type": "Commercial",
-    "url": "https://tapdaq.com/terms-and-conditions"
-  },
+  "license": "Commercial",
   "homepage": "https://tapdaq.com"
 }

@@ -1,0 +1,14 @@
+{
+  "name": "cordova-plugin-tapdaq-tiktok",
+  "version": "7.4.0",
+  "description": "Tapdaq TikTok adapter for Apache Cordova",
+  "cordova": {
+    "id": "cordova-plugin-tapdaq-tiktok",
+    "platforms": [
+      "ios"
+    ]
+  },    
+  "author": "Tapdaq",
+  "license": "Commercial",
+  "homepage": "https://tapdaq.com"
+}

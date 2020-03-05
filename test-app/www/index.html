@@ -18,135 +18,169 @@
     under the License.
 -->
 <html>
-    <head>
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, see:
-            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
-        Some notes:
-            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src * data: content:;">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
-        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
-		<link rel="stylesheet" type="text/css" href="css/bootstrap-combobox.css">
-        <title>Test Tapdaq app</title>
-    </head>
-    <body>
-        <div class="app">
-            <h3>Test Tapdaq cordova plugin</h3>
-            <div id="deviceready" class="blink">
-                <fieldset id="console-log-div"></fieldset>
+
+<head>
+    <!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+    -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src * data: content:;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-combobox.css">
+    <title>Test Tapdaq app</title>
+</head>
+
+<body>
+    <div class="app container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Tapdaq Cordova Plugin</h4>
             </div>
-            <button id="init-sdk-btn" class="btn btn-info btn-block">Init SDK</button>
-            <!--<button id="load-ads-btn" class="btn btn-success btn-block">Load ads</button>-->
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-interstitial-btn" class="btn btn-success btn-block  load-btn" disabled>Load Interstitial</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-interstitial-btn" class="btn btn-default btn-block  show-btn" disabled>Show Interstitial</button>
-                </div>
-            </div>		
-			<div class="row" style="margin-top: 10px;margin-bottom: 10px;">
-				<div class="col-xs-12 col-sm-12">
-					<select name="banner-size" id="banner-size-select">
-						<option value="">Choose a banner size</option>
-						<option value="STANDARD">Standard</option>
-						<option value="MEDIUM_RECT">Medium Rect</option>
-						<option value="LARGE">Large</option>
-						<option value="FULL">Full</option>
-						<option value="LEDERBOARD">Lederboard</option>
-						<option value="SMART">Smart</option>
-					</select>
-				</div>    
-			</div>			
-            <div class="row">
-                <div class="col-sm-12 col-xs-12">
-                    <button id="load-banner-btn" class="btn btn-success btn-block  load-btn" disabled>Load Banner</button>
-                </div>				           
+            <div class="col-xs-12">
+                <form id="placement-tag-form"> 
+                    <div class="form-group">
+                        <input id="placement-tag-field" type="text" class="form-control" placeholder="Placement Tag" value="default" />
+                    </div>
+                </form>
             </div>
-			<div class="row">
-				 <div class="col-sm-12">
-                    <button id="show-banner-btn" class="btn btn-default btn-block  show-btn" disabled>Show Banner</button>
-                    <button id="hide-banner-btn" class="btn btn-default btn-block  hidden">Hide Banner</button>
-                </div>
-			</div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-video-btn" class="btn btn-success btn-block  load-btn" disabled>Load Video</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-video-btn" class="btn btn-default btn-block  show-btn" disabled>Show Video</button>
-                </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button id="init-sdk-btn" class="btn btn-info btn-block">Init SDK</button>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-video-reward-btn" class="btn btn-success btn-block  load-btn" disabled>Load Video Reward</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-video-reward-btn" class="btn btn-default btn-block  show-btn">Show Video Reward</button>
-                </div>
+            <div class="col-xs-6">
+                <button id="show-mediation-debug-btn" class="btn btn-warning btn-block debug-btn">Debugger</button>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-offerwall-btn" class="btn btn-success btn-block  load-btn" disabled>Load Offerwall</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-offerwall-btn" class="btn btn-default btn-block  show-btn">Show Offerwall</button>
-                </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button id="load-interstitial-btn" class="btn btn-success btn-block load-btn" disabled>Load Interstitial</button>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-moreapps-btn" class="btn btn-success btn-block  load-btn" disabled>Load MoreApps</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-moreapps-btn" class="btn btn-default btn-block  show-btn">Show MoreApps</button>
-                </div>
+            <div class="col-xs-6">
+                <button id="show-interstitial-btn" class="btn btn-default btn-block show-btn" disabled>Show Interstitial</button>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <button id="load-native-btn" class="btn btn-success btn-block load-btn" disabled>Load Native Ad</button>
-                </div>
-                <div class="col-sm-6">
-                    <button id="show-native-btn" class="btn btn-default btn-block show-btn">Show native Ad</button>
-                </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button id="load-video-btn" class="btn btn-success btn-block load-btn" disabled>Load Video</button>
             </div>
-            <div class="row">                
-                <div class="col-sm-6">
-                    <button id="show-mediation-debug-btn" class="btn btn-warning btn-block debug-btn">Show mediation debug panel</button>
-                </div>
+            <div class="col-xs-6">
+                <button id="show-video-btn" class="btn btn-default btn-block show-btn" disabled>Show Video</button>
             </div>
-            
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button id="load-video-reward-btn" class="btn btn-success btn-block load-btn" disabled>Load Rewarded</button>
+            </div>
+            <div class="col-xs-6">
+                <button id="show-video-reward-btn" class="btn btn-default btn-block show-btn" disabled>Show Rewarded</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <h5>Banner</h5>
+            </div>
+            <div class="col-xs-3">
+                <button id="load-banner-btn" class="btn btn-default btn-block load-btn" disabled>Load</button>
+            </div>
+            <div class="col-xs-3">
+                <button id="show-banner-btn" class="btn btn-default btn-block show-btn" disabled>Show</button>
+            </div>
+            <div class="col-xs-3">
+                <button id="hide-banner-btn" class="btn btn-default btn-block show-btn" disabled>Hide</button>
+            </div>
+            <div class="col-xs-3">
+                <button id="destroy-banner-btn" class="btn btn-default btn-block show-btn" disabled>Destroy</button>
+            </div>
         </div>
 
-        <!-- example of container for Native ad -->
-        <div class="native-ad-container">
-            <img class="tapdaq-ad-icon" src="" width="48" height="48" />            
-            <div class="card" style="width: 100%;">                                
-                <img class="card-img-top tapdaq-ad-image tapdaq-click-btn" src="" />
-                <div class="card-block">                                        
-                    <h4 class="card-title tapdaq-ad-app-name"></h4>
-                    <p class="card-subtitle mb-2 text-muted">Price: <span class="tapdaq-ad-price"></span><span class="tapdaq-ad-currency"></span>, Age Rating: <span class="tapdaq-ad-age-rating"></p>
-                    <p class="card-text tapdaq-ad-description"></p>
-                    <a href="#" class="btn btn-primary click-btn tapdaq-click-btn">Download</a>
-                </div>                
+        <div class="row">
+            <div class="btn-group col-xs-6">
+                <div class="dropdown" id="bannerSizeMenu">
+                    <button class="btn btn-default btn-block dropdown-toggle load-btn" type="button" data-toggle="dropdown" data-customtag="banner-size-input" aria-haspopup="true" aria-expanded="true">
+                    <span>Size</span>
+                    <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="bannerSizeMenu">
+                    <li><a href="#" data-value="standard">Standard</a></li>
+                    <li><a href="#" data-value="medium">Medium</a></li>
+                    <li><a href="#" data-value="large">Large</a></li>
+                    <li><a href="#" data-value="full">Full</a></li>
+                    <li><a href="#" data-value="leaderboard">Leaderboard</a></li>
+                    <li><a href="#" data-value="smart">Smart</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" data-value="custom">Custom</a></li>
+                    </ul>
+                </div>
             </div>
-            <button class="btn close-btn">&times;</button>            
+            <div class="btn-group  col-xs-6">
+                <div class="dropdown" id="bannerPositionMenu">
+                    <button class="btn btn-default btn-block dropdown-toggle load-btn" type="button" data-toggle="dropdown" data-customtag="banner-position-input" aria-haspopup="true" aria-expanded="true">
+                    Position 
+                    <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="bannerPositionMenu">
+                    <li><a href="#" data-value="top">Top</a></li>
+                    <li><a href="#" data-value="bottom">Bottom</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" data-value="custom">Custom</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <form class="form-inline">
+                <div class="form-group">
+                    <div class="col-xs-3">
+                        <label for="banner_width">Width</label>
+                        <input class="form-control banner-size-input" id="banner-width" type="number" value="320" disabled />
+                    </div>
+                    <div class="col-xs-3">
+                        <label for="banner_height">Height</label>
+                        <input class="form-control banner-size-input" id="banner-height" type="number" value="50" disabled />
+                    </div>
+                    <div class="col-xs-3">
+                        <label for="banner_x">X</label>
+                        <input class="form-control banner-position-input" id="banner-x" type="number" value="0" disabled />
+                    </div>
+                    <div class="col-xs-3">
+                        <label for="banner_y">Y</label>
+                        <input class="form-control banner-position-input" id="banner-y" type="number" value="0" disabled />
+                    </div>
+
+                </div>
+            </form>
         </div>
 
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap-combobox.js"></script>
-        <script type="text/javascript" src="js/moment.js"></script>
-        <script type="text/javascript" src="js/console-log-div.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-    </body>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="deviceready">
+                    <fieldset id="console-log-div"></fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-combobox.js"></script>
+    <script type="text/javascript" src="js/moment.js"></script>
+    <script type="text/javascript" src="js/console-log-div.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+</body>
+
 </html>

@@ -1,872 +1,982 @@
 package com.tapdaq.cordovasdk;
 
-import android.content.Context;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
-import android.view.WindowManager;
-import android.widget.PopupWindow;
+import android.app.Activity;
 
-import com.tapdaq.cordovasdk.listeners.AdListener;
-import com.tapdaq.cordovasdk.listeners.NativeAdListener;
-import com.tapdaq.cordovasdk.enums.*;
+import com.google.android.gms.common.util.Strings;
+import com.google.gson.Gson;
+import com.tapdaq.sdk.STATUS;
+import com.tapdaq.sdk.TDBanner;
+import com.tapdaq.sdk.Tapdaq;
+import com.tapdaq.sdk.TapdaqConfig;
+import com.tapdaq.sdk.adnetworks.TMMediationNetworks;
+import com.tapdaq.sdk.common.TMAdError;
+import com.tapdaq.sdk.helpers.TLog;
+import com.tapdaq.sdk.helpers.TLogLevel;
+import com.tapdaq.sdk.listeners.TMAdListener;
+import com.tapdaq.sdk.listeners.TMInitListener;
+import com.tapdaq.sdk.model.rewards.TDReward;
 
-import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
-
-
-import org.apache.cordova.LOG;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
-import com.tapdaq.sdk.CreativeType;
-import com.tapdaq.sdk.TMBannerAdView;
-import com.tapdaq.sdk.Tapdaq;
-import com.tapdaq.sdk.TapdaqConfig;
-import com.tapdaq.sdk.ads.TapdaqPlacement;
-import com.tapdaq.sdk.helpers.TLog;
-import com.tapdaq.sdk.helpers.TMDevice;
-import com.tapdaq.sdk.TMNativeAd;
-import com.tapdaq.sdk.helpers.TLogLevel;
-import com.tapdaq.sdk.listeners.TMAdListener;
-import com.tapdaq.sdk.listeners.TMInitListener;
-import com.tapdaq.sdk.moreapps.TMMoreAppsListener;
-import com.tapdaq.sdk.model.TMAdSize;
-import com.tapdaq.sdk.common.*;
-import com.tapdaq.sdk.adnetworks.*;
-import com.tapdaq.sdk.moreapps.TMMoreAppsConfig;
-
-import java.lang.ClassNotFoundException;
-import java.lang.Exception;
-import java.lang.Override;
-import java.lang.Runnable;
-import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
-
-/**
- * This class echoes a string called from JavaScript.
- */
 public class CDVTapdaq extends CordovaPlugin {
-  
-    public enum AdBannerSize {
-        STANDARD,
-        LARGE,
-        MEDIUM_RECT,
-        FULL,
-        LEADERBOARD,
-        SMART
-    }
 
-    public enum AdBannerPosition {
-        TOP,
-        BOTTOM
-    }
+    private static final String ACTION_INIT = "init";
+    private static final String ACTION_LAUNCH_DEBUGGER = "launchDebugger";
+    private static final String ACTION_LOAD_AD = "load";
+    private static final String ACTION_IS_AD_READY = "isReady";
+    private static final String ACTION_SHOW_AD = "show";
+    private static final String ACTION_HIDE_AD = "hide";
+    private static final String ACTION_DESTROY_AD = "destroy";
+    private static final String ACTION_USER_SUBJECT_TO_GDPR_STATUS = "userSubjectToGDPRStatus";
+    private static final String ACTION_SET_USER_SUBJECT_TO_GDPR = "setUserSubjectToGDPR";
+    private static final String ACTION_CONSENT_STATUS = "consentStatus";
+    private static final String ACTION_SET_CONSENT = "setConsent";
+    private static final String ACTION_AGE_RESTRICTED_USER_STATUS = "ageRestrictedUserStatus";
+    private static final String ACTION_SET_AGE_RESTRICTED_USER = "setAgeRestrictedUser";
+    private static final String ACTION_FORWARD_USERID = "forwardUserId";
+    private static final String ACTION_SET_FORWARD_USERID = "setForwardUserId";
+    private static final String ACTION_USER_ID = "userId";
+    private static final String ACTION_SET_USER_ID = "setUserId";
+    private static final String ACTION_REWARD_ID = "rewardId";
+    private static final String ACTION_SET_LOG_LEVEL = "setLogLevel";
 
-    static boolean debugging = false;
-    static boolean autoReload = false;
-    static String TAG = "Tapdaq Cordova Plugin";
+    private static final String CDV_CONFIG_KEY_ANDROID = "android";
+    private static final String CDV_CONFIG_KEY_APP_ID = "appId";
+    private static final String CDV_CONFIG_KEY_CLIENT_KEY = "clientKey";
+    private static final String CDV_CONFIG_KEY_TEST_DEVICES = "testDevices";
 
-    static TMBannerAdView bannerAdView;
-    static PopupWindow popupWindow;
-    
-    static String bannerType = "";
+    private static final String CDV_CONFIG_KEY_PLUGIN_VERSION = "pluginVersion";
+    private static final String CDV_CONFIG_KEY_USER_ID = "userId";
+    private static final String CDV_CONFIG_KEY_FORWARD_USER_ID = "forwardUserId";
+    private static final String CDV_CONFIG_KEY_LOG_LEVEL = "logLevel";
+    private static final String CDV_CONFIG_KEY_USER_SUBJECT_TO_GDPR = "userSubjectToGDPR";
+    private static final String CDV_CONFIG_KEY_CONSENT_GIVEN = "isConsentGiven";
+    private static final String CDV_CONFIG_KEY_AGE_RESTRICTED_USER = "isAgeRestrictedUser";
+    private static final String CDV_CONFIG_KEY_ADMOB_CONTENT_RATING = "adMobContentRating";
 
-    static List<CreativeType> enabledCreativeTypes = new ArrayList<CreativeType>();
+    private static final String CDV_AD_UNIT_INTERSTITIAL = "static_interstitial";
+    private static final String CDV_AD_UNIT_VIDEO = "video_interstitial";
+    private static final String CDV_AD_UNIT_REWARDED_VIDEO = "rewarded_video_interstitial";
+    private static final String CDV_AD_UNIT_BANNER = "banner";
 
-    static List<String> availableAdTypes = new ArrayList<String>(Arrays.asList(AdType.names()));
-    static List<String> supportedBannerSizes = new ArrayList<String>(Arrays.asList(new String[]{AdBannerSize.STANDARD.name(), AdBannerSize.LARGE.name(), AdBannerSize.MEDIUM_RECT.name(), AdBannerSize.FULL.name(), AdBannerSize.LEADERBOARD.name(), AdBannerSize.SMART.name()}));
+    private static final String CDV_OPTS_AD_UNIT = "adUnit";
+    private static final String CDV_OPTS_PLACEMENT_TAG = "placementTag";
 
-    static Map<String, NativeAdListener> nativeAdListeners = null;
+    private static final String CDV_OPTS_BANNER_SIZE = "bannerSize";
+    private static final String CDV_OPTS_BANNER_WIDTH = "bannerWidth";
+    private static final String CDV_OPTS_BANNER_HEIGHT = "bannerHeight";
+
+    private static final String CDV_OPTS_BANNER_POSITION = "bannerPosition";
+    private static final String CDV_OPTS_BANNER_X = "bannerX";
+    private static final String CDV_OPTS_BANNER_Y = "bannerY";
+
+    private static final String CDV_BANNER_SIZE_CUSTOM = "custom";
+    private static final String CDV_BANNER_POSITION_CUSTOM = "custom";
+
+    private static final String CDV_TEST_DEVICES_KEY_NETWORK = "network";
+    private static final String CDV_TEST_DEVICES_KEY_DEVICES = "devices";
+
+    private Tapdaq tapdaq;
 
     @Override
-    public void onPause(boolean multitasking) {
-        super.onPause(multitasking);
-        Tapdaq.getInstance().onPause(this.cordova.getActivity());
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+        this.tapdaq = Tapdaq.getInstance();
     }
 
     @Override
-    public void onResume(boolean multitasking) {
-        super.onResume(multitasking);
-        Tapdaq.getInstance().onResume(this.cordova.getActivity());
-    }
-
-    @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-
-        if(debugging){
-            TLog.setLoggingLevel(TLogLevel.DEBUG);
-        }else{
-            TLog.setLoggingLevel(TLogLevel.ERROR);
+    public boolean execute(final String action,
+                           final JSONArray args,
+                           final CallbackContext callbackContext) throws JSONException {
+        switch (action) {
+            case ACTION_INIT:
+                return initAction(args, callbackContext);
+            case ACTION_LAUNCH_DEBUGGER:
+                return launchDebuggerAction();
+            case ACTION_LOAD_AD:
+                return loadAdAction(args, callbackContext);
+            case ACTION_IS_AD_READY:
+                return isAdReadyAction(args, callbackContext);
+            case ACTION_SHOW_AD:
+                return showAdAction(args, callbackContext);
+            case ACTION_HIDE_AD:
+                return hideAdAction(args, callbackContext);
+            case ACTION_DESTROY_AD:
+                return destroyAdAction(args, callbackContext);
+            case ACTION_USER_SUBJECT_TO_GDPR_STATUS:
+                return userSubjectToGDPRStatusAction(callbackContext);
+            case ACTION_SET_USER_SUBJECT_TO_GDPR:
+                return setUserSubjectToGDPRAction(args, callbackContext);
+            case ACTION_CONSENT_STATUS:
+                return consentStatusAction(callbackContext);
+            case ACTION_SET_CONSENT:
+                return setConsentAction(args, callbackContext);
+            case ACTION_AGE_RESTRICTED_USER_STATUS:
+                return ageRestrictedUserStatusAction(callbackContext);
+            case ACTION_SET_AGE_RESTRICTED_USER:
+                return setAgeRestrictedUserAction(args, callbackContext);
+            case ACTION_FORWARD_USERID:
+                return forwardUserIdAction(callbackContext);
+            case ACTION_SET_FORWARD_USERID:
+                return setForwardUserIdAction(args, callbackContext);
+            case ACTION_USER_ID:
+                return userIdAction(callbackContext);
+            case ACTION_SET_USER_ID:
+                return setUserIdAction(args, callbackContext);
+            case ACTION_REWARD_ID:
+                return rewardIdAction(args, callbackContext);
+            case ACTION_SET_LOG_LEVEL:
+                return setLogLevelAction(args, callbackContext);
         }
-        if(nativeAdListeners == null){
-            nativeAdListeners = new HashMap<String, NativeAdListener>();
-        }
-        if (action.equals("init")) {
-            this.init(args.getJSONObject(0), callbackContext);
-            return true;
-        }else  if (action.equals("load")) {
-            this.load(args.getJSONObject(0), callbackContext);
-            return true;
-        }else if (action.equals("show")) {
-            this.show(args.getJSONObject(0), callbackContext);
-            return true;
-        }else if (action.equals("hide")) {
-            this.hide(args.getJSONObject(0), callbackContext);
-            return true;
-        }else if (action.equals("triggerNativeAdClick")) {
-            this.triggerNativeAdClick(args.getJSONObject(0), callbackContext);
-            return true;
-        }else if (action.equals("isReady")) {
-            this.isReady(args.getJSONObject(0), callbackContext);
-            return true;
-        }else if (action.equals("showDebugPanel")) {
-            if(!debugging){
-                Log.i(TAG, "DEBUG Mode is disabled, set debugMode option to 'true' to enable it");
-                return true;
-            }
-            Tapdaq.getInstance().startTestActivity(cordova.getActivity());
-            return true;
-        }else if (action.equals("triggerNativeAdImpression")) {
-            this.triggerNativeAdImpression(args.getJSONObject(0), callbackContext);
-            return true;
-        }
-
         return false;
     }
 
-    private void init(final JSONObject options, final CallbackContext callbackContext) {
-		boolean isValid = validateInitOptions(options);
-                if (!isValid) {
-                    callbackContext.error("Invalid options are given");
-                    return;
-                }
-                log("init SDK");
-                JSONArray enabledTagsPlacements = null;
-                try {
-                    enabledTagsPlacements = options.getJSONArray("enabledPlacements");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
+    private boolean initAction(final JSONArray args,
+                               final CallbackContext callbackContext) throws JSONException {
+        final JSONObject options = args.getJSONObject(0);
 
-                String debug  = null;
-                try {
-                    debug = options.getString("debugMode");
-                } catch (JSONException ex) {
-                    debug = "false";
-                    error(ex.getMessage(), ex);
-                }
-                if(debug != null && debug.equals("true")){
-                    debugging = true;
-                }
-                
-                String autoReloadStr  = null;
-                try {
-                    autoReloadStr = options.getString("autoReload");
-                } catch (JSONException ex) {
-                    autoReloadStr = "false";
-                    error(ex.getMessage(), ex);
-                }
-                if(autoReloadStr != null && autoReloadStr.equals("true")){
-                    autoReload = true;
-                }
-
-                JSONObject androidOpts = null;
-                String appId = null;
-                String clientKey = null;
-                JSONArray devicesByProvider = null;
-                try {
-                    androidOpts = options.getJSONObject("android");
-                    appId = androidOpts.getString("appId");
-                    clientKey = androidOpts.getString("clientKey");
-                    devicesByProvider = androidOpts.getJSONArray("testDevices");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
-
-
-                Map<String, List<String>> devices = retrieveDevices(devicesByProvider);
-
-                TapdaqConfig config = new TapdaqConfig(cordova.getActivity());
-                List<TapdaqPlacement> enabledPlacements = new ArrayList<TapdaqPlacement>();
-
-                for (int i = 0; i < enabledTagsPlacements.length(); i++) {
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = enabledTagsPlacements.getJSONObject(i);
-                    } catch (JSONException e) {
-                        error(e.getMessage(), e);
-                    }
-                    if (jsonObject == null) {
-                        continue;
-                    }
-                    String adType = null;
-                    List<String> tagsList = new ArrayList<String>();
-                    try {
-                        adType = jsonObject.getString("adType");
-                        JSONArray tags = jsonObject.getJSONArray("tags");
-                        if (tags != null) {
-                            for (int tagNum = 0; tagNum < tags.length(); tagNum++) {
-                                tagsList.add(tags.getString(tagNum));
-                            }
-                        }
-                    } catch (JSONException e) {
-                        error(e.getMessage(), e);
-                    }
-                    if (adType != null) {
-                        for (String tag : tagsList) {
-                            log("Tag: " + tag + "    adType: " + adType);
-                            enabledPlacements.add(TapdaqPlacement.createPlacement(TapdaqHelper.GetCreativeTypesFromString(adType), tag));
-                        }
-                    }
-                }
-
-                try {
-                    
-                    config.setAutoReloadAds(autoReload);
-                    
-                    List<String> adMobDevices = devices.get(TMMediationNetworks.AD_MOB_NAME); 
-                    config.registerTestDevices(TMMediationNetworks.AD_MOB, adMobDevices);
-                    
-                    List<String> fbDevices = devices.get(TMMediationNetworks.FACEBOOK_NAME); 
-                    config.registerTestDevices(TMMediationNetworks.FACEBOOK, fbDevices);
-					
-                    config.withPlacementTagSupport(enabledPlacements.toArray(new TapdaqPlacement[enabledPlacements.size()]));
-                    Tapdaq.getInstance().initialize(cordova.getActivity(), appId, clientKey, config, new TMInitListener() {
-                        @Override
-                        public void didInitialise() {
-                            dispatchEvent("didInitialise", new JSONObject(), callbackContext);
-                        }
-                    });
-                } catch (Throwable ex) {
-                    error(ex.getMessage(), ex);
-                }
-        /*cordova.getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                
-            }
-        });*/
-    }
-	
-	
-    private Map<String, List<String>> retrieveDevices(JSONArray input)
-    {
-
-        Map<String, List<String>> devices = new HashMap<String, List<String>>();
-        if(input == null) {
-            return devices;
+        if (!options.has(CDV_CONFIG_KEY_ANDROID)) {
+            callbackContext.error("android config has not been provided");
+            return true;
         }
 
-        for(int i = 0; i < input.length(); i++){
-            JSONObject obj = null;
-            try{
-                obj = input.getJSONObject(i);
-            } catch (JSONException ex) {
-                error(ex.getMessage(), ex);
-            }
-            if(obj != null){
-                String providerName = null;
-                JSONArray devicesIds = null;
-                try{
-                    providerName = obj.getString("network");
-                    devicesIds = obj.getJSONArray("devices");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
-                if(providerName == null || devicesIds == null){
-                    continue;
-                }
-                List<String> devs = new ArrayList<String>();
-                for(int j = 0; j < devicesIds.length(); j++){
-                    try {
-                        devs.add(devicesIds.getString(j));
-                    }catch (JSONException e){
-                        error(e.getMessage(), e);
-                    }
-                }
-                devices.put(providerName, devs);
-            }
-
-        }        
-        if(!devices.containsKey(TMMediationNetworks.AD_MOB_NAME)){
-            devices.put(TMMediationNetworks.AD_MOB_NAME, new ArrayList<String>());
-        }
-        if(!devices.containsKey(TMMediationNetworks.FACEBOOK_NAME)){
-            devices.put(TMMediationNetworks.FACEBOOK_NAME, new ArrayList<String>());
-        }
-        return devices;
-    }
-
-    private void load(final JSONObject options, final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             @Override
-            public void run() {
-                boolean isValid = validateLoadOptions(options);
-                if (!isValid) {
-                    callbackContext.error("Invalid options are given");
-                    return;
-                }
-
-                String adType = null;
-                String tag = null;
-                String size = null;
-
+            public void run()
+            {
                 try {
-                    adType = options.getString("adType");
-                    tag = options.getString("tag");
-                    size = options.getString("size");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
-                
-                JSONObject jsonConfig = null;
-                try {
-                    jsonConfig = options.getJSONObject("options");                    
-                } catch (JSONException ex) {
-                   
-                }
+                    TapdaqConfig config = generateConfigGivenOptions(options);
 
-                if (tag == null) {
-                    tag = TapdaqPlacement.TDPTagDefault;
-                }
+                    CDVTDErrorDeSer util = new CDVTDErrorDeSer(new Gson());
+                    CDVTapdaqInitListener initListener = new CDVTapdaqInitListener(callbackContext, util);
 
-                if (size == null) {
-                    size = AdBannerSize.STANDARD.name();
-                }
+                    JSONObject androidOptions = options.getJSONObject(CDV_CONFIG_KEY_ANDROID);
 
-                log("load adType: " + adType + "; tag: " + tag);                
-                AdType type = AdType.valueOf(adType);
-				if(type == AdType.AdTypeBanner){
-					tag = null;
-				}
-				TMAdListener listener = new AdListener(adType, tag, callbackContext);
-                switch (type) {
-                    case AdTypeInterstitial:
-                        Tapdaq.getInstance().loadInterstitial(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeVideo:
-                        Tapdaq.getInstance().loadVideo(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeRewardedVideo:
-                        Tapdaq.getInstance().loadRewardedVideo(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeOfferwall:
-                        Tapdaq.getInstance().loadOfferwall(cordova.getActivity(), listener);
-                        break;
-                    case AdTypeMoreApps:
-                        TMMoreAppsConfig config;
-                        if(jsonConfig != null){
-                            config = TapdaqHelper.createMoreAppsConfigFromJSON(jsonConfig);
-                        }else{
-                            config = new TMMoreAppsConfig();
-                        }
-                        Tapdaq.getInstance().loadMoreApps(cordova.getActivity(), config, ((AdListener)listener).createMoreAppsListener());
-                        break;
-                    case AdTypeBanner:
-                        loadBanner(size, listener);
-                        break;
-                    default:
-                        listener = new NativeAdListener(adType, tag, cordova.getActivity(), callbackContext);
-                        nativeAdListeners.put(adType + "_" + tag, (NativeAdListener) listener);
-                        Tapdaq.getInstance().loadNativeAdvert(cordova.getActivity(), TapdaqHelper.GetCreativeTypesFromString(adType).get(0), tag, listener);
-                }
-
-            }
-        });
-    }
-
-
-    private void show(final JSONObject options, final CallbackContext callbackContext) {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                boolean isValid = validateShowOptions(options);
-                if (!isValid) {
-                    callbackContext.error("Invalid options are given");
-                    return;
-                }
-
-                String adType = null;
-                String tag = null;
-                String position = null;
-
-                try {
-                    adType = options.getString("adType");
-                    tag = options.getString("tag");
-                    position = options.getString("position");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
-
-                if (tag == null) {
-                    tag = TapdaqPlacement.TDPTagDefault;
-                }
-
-                if (position == null) {
-                    position = AdBannerPosition.BOTTOM.name();
-                }
-
-                log("show adType: " + adType + "; tag: " + tag + "; position: " + position);
-
-                AdListener listener = new AdListener(adType, tag, callbackContext);
-                AdType type = AdType.valueOf(adType);
-                switch (type) {
-                    case AdTypeInterstitial:
-                        Tapdaq.getInstance().showInterstitial(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeVideo:
-                        Tapdaq.getInstance().showVideo(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeRewardedVideo:
-                        Tapdaq.getInstance().showRewardedVideo(cordova.getActivity(), tag, listener);
-                        break;
-                    case AdTypeOfferwall:
-                        Tapdaq.getInstance().showOfferwall(cordova.getActivity(), listener);
-                        break;
-                     case AdTypeMoreApps:
-                        Tapdaq.getInstance().showMoreApps(cordova.getActivity(), ((AdListener)listener).createMoreAppsListener());
-                        break;
-                    case AdTypeBanner:
-                        showBanner(position, listener);
-                        break;
-
-                }
-            }
-        });
-    }
-
-    private void hide(final JSONObject options, final CallbackContext callbackContext) {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String adType = null;
-
-                try{
-                    adType = options.getString("adType");
-                }catch (JSONException ex){
-                }
-
-                log("hide adType: " + adType);
-                if (!adType.equals(AdType.AdTypeBanner.name())) {
-                    callbackContext.error("Method hide available only for AdTypeBanner");
-                    return;
-                }
-
-                hideBanner();
-            }
-        });
-    }
-    
-    private void isReady(final JSONObject options, final CallbackContext callbackContext) {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String adType = null;
-                String tag = null;
-
-                try{
-                    adType = options.getString("adType");
-                }catch (JSONException ex){
-                    String msg = "Tapdaq::isReady(): adType is required field";
-                    error(msg);
-                    callbackContext.error(msg);
-                    return;
-                }
-                AdType type = AdType.valueOf(adType);
-                
-                try{
-                    tag = options.getString("tag");
-                }catch (JSONException ex){
-                    if(type != AdType.AdTypeBanner && type != AdType.AdTypeOfferwall){
-                        String msg = "Tapdaq::isReady(): tag is required field";
-                        error(msg);
-                        callbackContext.error(msg);
-                        return;
+                    String appId = "";
+                    if (androidOptions.has(CDV_CONFIG_KEY_APP_ID)
+                             && androidOptions.get(CDV_CONFIG_KEY_APP_ID) instanceof String) {
+                        appId = androidOptions.getString(CDV_CONFIG_KEY_APP_ID);
                     }
-                }
-                
-                if(adType != null){
-                    Boolean res = false;                    
-                    switch(type){
-                        case AdTypeInterstitial : 
-                            res = Tapdaq.getInstance().isInterstitialReady(cordova.getActivity(), tag);
-                            break;
-                        case AdTypeVideo : 
-                            res = Tapdaq.getInstance().isVideoReady(cordova.getActivity(), tag);
-                            break;
-                        case AdTypeRewardedVideo : 
-                            res = Tapdaq.getInstance().isRewardedVideoReady(cordova.getActivity(), tag);
-                            break;  
-                        case AdTypeOfferwall : 
-                            res = Tapdaq.getInstance().isOfferwallReady(cordova.getActivity());
-                            break;  
-                        case AdTypeMoreApps : 
-                            res = Tapdaq.getInstance().isMoreAppsReady(cordova.getActivity());
-                            break; 
-                        case AdTypeBanner : 
-                            res = bannerAdView != null && bannerAdView.isReady();
-                            break;  							
-                        default: 
-                            if(AdType.isNativeAd(type)){
-                                res = Tapdaq.getInstance().isNativeAdvertReady(cordova.getActivity(), TapdaqHelper.GetCreativeTypesFromString(adType).get(0), tag);
-                            }else{
-                                callbackContext.error("Invalid adType is given: " + adType);
-                                return;
-                            }
-                            break;
-                    
+
+                    String clientKey = "";
+                    if (androidOptions.has(CDV_CONFIG_KEY_CLIENT_KEY)
+                             && androidOptions.get(CDV_CONFIG_KEY_CLIENT_KEY) instanceof String) {
+                        clientKey = androidOptions.getString(CDV_CONFIG_KEY_CLIENT_KEY);
                     }
-                    
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, res);
-                    result.setKeepCallback(true);
-                    callbackContext.sendPluginResult(result);
+
+                    tapdaq.initialize(cordova.getActivity(), appId, clientKey, config, initListener);
+                } catch (JSONException e) {
+                    callbackContext.error(e.getMessage());
                 }
             }
         });
+
+        return true;
     }
 
-    private void triggerNativeAdClick(final JSONObject options, final CallbackContext callbackContext) {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String adType = null;
-                String tag = null;
-                String id = null;
-
-                try{
-                    adType = options.getString("adType");
-                    tag = options.getString("tag");
-                    id = options.getString("id");
-                }catch (JSONException ex){
-                    error(ex.getMessage(), ex);
-                }
-
-                if(adType == null){
-                    error("adType is required field");
-                    return;
-                }
-                if(id == null){
-                    error("id is required field");
-                    return;
-                }
-                if(tag == null){
-                    error("tag is required field");
-                    return;
-                }
-
-                log("triggerNativeAdClick adType: " + adType + ", tag: " + tag + ", id:" + id);
-
-                NativeAdListener listener = null;
-                if(nativeAdListeners.containsKey(adType + "_" + tag)){
-                    listener = nativeAdListeners.get(adType + "_" + tag);
-                }
-                if(listener != null){
-                    TMNativeAd ad = listener.findAdByID(id);
-                    if(ad != null){
-                        ad.triggerClick(cordova.getActivity());
-                        dispatchEvent("didClick", createEventResult(adType, tag, new JSONObject()), callbackContext);
-                        log("native ad click is triggered for id: " + id);
-                    }
-                }
-            }
-        });
-    }
-
-    private void triggerNativeAdImpression(final JSONObject options, final CallbackContext callbackContext) {
+    private boolean launchDebuggerAction() {
         cordova.getThreadPool().execute(new Runnable() {
             @Override
-            public void run() {
-                String adType = null;
-                String tag = null;
-                String id = null;
+            public void run()
+            {
+                tapdaq.startTestActivity(cordova.getActivity());
+            }
+        });
 
-                try {
-                    adType = options.getString("adType");
-                    tag = options.getString("tag");
-                    id = options.getString("id");
-                } catch (JSONException ex) {
-                    error(ex.getMessage(), ex);
-                }
+        return true;
+    }
 
-                if (adType == null) {
-                    error("adType is required field");
-                    return;
-                }
-                if (id == null) {
-                    error("id is required field");
-                    return;
-                }
-                if (tag == null) {
-                    error("tag is required field");
-                    return;
-                }
+    private boolean loadAdAction(final JSONArray args,
+                                 final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
 
-                log("triggerNativeAdImpression adType: " + adType + ", tag: " + tag + ", id:" + id);
+        String adUnitStr = options.optString(CDV_OPTS_AD_UNIT, "");
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
 
-                NativeAdListener listener = null;
-                if (nativeAdListeners.containsKey(adType + "_" + tag)) {
-                    listener = nativeAdListeners.get(adType + "_" + tag);
-                }
-                if (listener != null) {
-                    TMNativeAd ad = listener.findAdByID(id);
-                    if (ad != null) {
-                        dispatchEvent("willDisplay", createEventResult(adType, tag, new JSONObject()), callbackContext);
-                        ad.triggerDisplay(cordova.getActivity());
-                        dispatchEvent("didDisplay", createEventResult(adType, tag, new JSONObject()), callbackContext);
-                        log("native ad impression is triggered for id: " + id);
+        CDVTDErrorDeSer util = new CDVTDErrorDeSer(new Gson());
+        CDVTapdaqAdListener listener = new CDVTapdaqAdListener(adUnitStr, placementTagStr, callbackContext, util);
+
+        Activity activity = this.cordova.getActivity();
+
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run()
+            {
+                switch (adUnitStr) {
+                    case CDV_AD_UNIT_INTERSTITIAL:
+                        tapdaq.loadInterstitial(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_VIDEO:
+                        tapdaq.loadVideo(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_REWARDED_VIDEO:
+                        tapdaq.loadRewardedVideo(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_BANNER:
+                    {
+                        String bannerSizeStr = options.optString(CDV_OPTS_BANNER_SIZE, "");
+
+                        if (bannerSizeStr.equalsIgnoreCase(CDV_BANNER_SIZE_CUSTOM)) {
+                            int bannerWidth = options.optInt(CDV_OPTS_BANNER_WIDTH);
+                            int bannerHeight = options.optInt(CDV_OPTS_BANNER_HEIGHT);
+                            TDBanner.Load(activity, placementTagStr, bannerWidth, bannerHeight, listener);
+                        } else {
+                            TDBanner.Load(activity, placementTagStr, convertBannerSize(bannerSizeStr), listener);
+                        }
+                        break;
                     }
                 }
             }
         });
+
+        return true;
     }
 
-    private void createBanner(TMAdSize size)
-    {
-        bannerAdView = new TMBannerAdView(cordova.getActivity());    
-        createPopupWindow(size);    
+    private boolean isAdReadyAction(final JSONArray args,
+                                    final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
+
+        String adUnitStr = options.optString(CDV_OPTS_AD_UNIT, "");
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
+
+        Activity activity = this.cordova.getActivity();
+
+        boolean isReady = false;
+        switch (adUnitStr) {
+            case CDV_AD_UNIT_INTERSTITIAL:
+                isReady = tapdaq.isInterstitialReady(activity, placementTagStr);
+                break;
+            case CDV_AD_UNIT_VIDEO:
+                isReady = tapdaq.isVideoReady(activity, placementTagStr);
+                break;
+            case CDV_AD_UNIT_REWARDED_VIDEO:
+                isReady = tapdaq.isRewardedVideoReady(activity, placementTagStr);
+                break;
+            case CDV_AD_UNIT_BANNER:
+                isReady = TDBanner.IsReady(placementTagStr);
+                break;
+        }
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, isReady);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
     }
 
-     private void createPopupWindow(TMAdSize size) {
-        float scale = TMDevice.getDeviceScaleAsFloat(cordova.getActivity());
-        float width = TMDevice.getWidth(cordova.getActivity());
+    private boolean showAdAction(final JSONArray args,
+                                 final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
 
-        log("Creating PopupWindow with size : : " + size.width + "," + size.height + " and scale = " + scale + " and width = " + width);
+        String adUnitStr = options.optString(CDV_OPTS_AD_UNIT, "");
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
 
-        float intWidth = size.width == 0 ? width : size.width * scale;
-        popupWindow = new PopupWindow(bannerAdView, (int)intWidth, (int)(size.height * scale));
+        CDVTDErrorDeSer util = new CDVTDErrorDeSer(new Gson());
+        CDVTapdaqAdListener listener = new CDVTapdaqAdListener(adUnitStr, placementTagStr, callbackContext, util);
 
-        // Copy system UI visibility flags set on Unity player window to newly created PopUpWindow.
-        int visibilityFlags = cordova.getActivity().getWindow().getAttributes().flags;
-        popupWindow.getContentView().setSystemUiVisibility(visibilityFlags);
+        Activity activity = this.cordova.getActivity();
 
-        // Workaround to prevent ad views from losing visibility on activity changes for certain
-        // devices (eg. Huawei devices).
-        TapdaqHelper.setPopUpWindowLayoutType(popupWindow,
-                WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run()
+            {
+                switch (adUnitStr) {
+                    case CDV_AD_UNIT_INTERSTITIAL:
+                        tapdaq.showInterstitial(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_VIDEO:
+                        tapdaq.showVideo(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_REWARDED_VIDEO:
+                        tapdaq.showRewardedVideo(activity, placementTagStr, listener);
+                        break;
+                    case CDV_AD_UNIT_BANNER: {
+                        String bannerPositionStr = options.optString(CDV_OPTS_BANNER_POSITION, "");
+
+                        if (bannerPositionStr.equalsIgnoreCase(CDV_BANNER_POSITION_CUSTOM)) {
+                            int bannerX = options.optInt(CDV_OPTS_BANNER_X);
+                            int bannerY = options.optInt(CDV_OPTS_BANNER_Y);
+                            TDBanner.Show(activity, placementTagStr, bannerX, bannerY);
+                        } else {
+                            TDBanner.Show(activity, placementTagStr, bannerPositionStr);
+                        }
+                    } break;
+                }
+            }
+        });
+
+        return true;
+    }
+
+    private boolean hideAdAction(final JSONArray args,
+                                 final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
+
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
+
+        Activity activity = this.cordova.getActivity();
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run()
+            {
+                TDBanner.Hide(activity, placementTagStr);
+            }
+        });
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
+    }
+
+    private boolean destroyAdAction(final JSONArray args,
+                                    final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
+
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
+        Activity activity = this.cordova.getActivity();
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run()
+            {
+                TDBanner.Destroy(activity, placementTagStr);
+            }
+        });
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
+    }
+
+    private boolean userSubjectToGDPRStatusAction(final CallbackContext callbackContext) {
+        Activity activity = this.cordova.getActivity();
+        STATUS userSubjectToGDPRStatus = tapdaq.isUserSubjectToGDPR(activity);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, userSubjectToGDPRStatus.getValue());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setUserSubjectToGDPRAction(final JSONArray args,
+                                               final CallbackContext callbackContext) throws JSONException {
+        int statusInt = args.getInt(0);
+        STATUS status = STATUS.valueOf(statusInt);
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setUserSubjectToGDPR(activity, status);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
+    }
+
+    private boolean consentStatusAction(final CallbackContext callbackContext) {
+        Activity activity = this.cordova.getActivity();
+        boolean isConsentGiven = tapdaq.isConsentGiven(activity);
+        STATUS consentStatus =  (isConsentGiven) ? STATUS.TRUE : STATUS.FALSE;
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, consentStatus.getValue());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setConsentAction(final JSONArray args,
+                                     final CallbackContext callbackContext) throws JSONException {
+        int statusInt = args.getInt(0);
+        boolean isConsentGiven = statusInt == STATUS.TRUE.getValue();
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setContentGiven(activity, isConsentGiven);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean ageRestrictedUserStatusAction(final CallbackContext callbackContext) {
+        Activity activity = this.cordova.getActivity();
+        boolean isAgeRestrictedUser = tapdaq.isAgeRestrictedUser(activity);
+        STATUS ageRestrictedUserStatus = (isAgeRestrictedUser) ? STATUS.TRUE : STATUS.FALSE;
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, ageRestrictedUserStatus.getValue());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setAgeRestrictedUserAction(final JSONArray args,
+                                               final CallbackContext callbackContext) throws JSONException {
+        int statusInt = args.getInt(0);
+        boolean isAgeRestrictedUser = statusInt == STATUS.TRUE.getValue();
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setIsAgeRestrictedUser(activity, isAgeRestrictedUser);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean adMobContentRatingAction(final CallbackContext callbackContext) {
+        String adMobContentRating = tapdaq.config().getAdMobContentRating();
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, adMobContentRating);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setAdMobContentRatingAction(final JSONArray args,
+                                                   final CallbackContext callbackContext) throws JSONException {
+        String adMobContentRating = args.getString(0);
+
+        tapdaq.config().setAdMobContentRating(adMobContentRating);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean forwardUserIdAction(final CallbackContext callbackContext) {
+        boolean forwardUser = tapdaq.config().shouldForwardUserId();
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, forwardUser);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setForwardUserIdAction(final JSONArray args,
+                                        final CallbackContext callbackContext) throws JSONException {
+        boolean forwardUserId = args.getBoolean(0);
+
+        tapdaq.config().setForwardUserId(forwardUserId);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean userIdAction(final CallbackContext callbackContext) {
+        String userId = tapdaq.config().getUserId();
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, userId);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setUserIdAction(final JSONArray args,
+                                    final CallbackContext callbackContext) throws JSONException {
+        String userId = args.getString(0);
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setUserId(activity, userId);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean rewardIdAction(final JSONArray args,
+                                   final CallbackContext callbackContext) throws JSONException {
+        String placementTag = args.getString(0);
+
+        Activity activity = this.cordova.getActivity();
+        String rewardId = tapdaq.getRewardId(activity, placementTag);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, rewardId);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setLogLevelAction(final JSONArray args,
+                                      final CallbackContext callbackContext) throws JSONException {
+        String logLevelStr = args.getString(0);
+        TLog.setLoggingLevel(TLogLevel.valueOf(logLevelStr.toUpperCase()));
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private TapdaqConfig generateConfigGivenOptions(final JSONObject options) throws JSONException {
+        TapdaqConfig config = tapdaq.config();
+
+        // Plugin version
+
+        String pluginVersion = options.optString(CDV_CONFIG_KEY_PLUGIN_VERSION);
+        if (!Strings.isEmptyOrWhitespace(pluginVersion)) {
+            config.setPluginVersion(pluginVersion);
+        }
+
+        // Log level
+
+        String logLevelStr = options.optString(CDV_CONFIG_KEY_LOG_LEVEL, TLogLevel.DISABLED.toString());
+        if (!Strings.isEmptyOrWhitespace(logLevelStr)) {
+            TLogLevel logLevel = TLogLevel.valueOf(logLevelStr.toUpperCase());
+            TLog.setLoggingLevel(logLevel);
+        }
+
+        // User ID
+
+        String userId = options.optString(CDV_CONFIG_KEY_USER_ID);
+        if (!Strings.isEmptyOrWhitespace(userId)) {
+            config.setUserId(userId);
+        }
+
+        // Forward User ID
+
+        boolean forwardUserId = options.optBoolean(CDV_CONFIG_KEY_FORWARD_USER_ID);
+        config.setForwardUserId(forwardUserId);
+
+        // User Subject to GDPR
+
+        if (options.has(CDV_CONFIG_KEY_USER_SUBJECT_TO_GDPR)) {
+            int userSubjectToGDPRStatusInt =
+                    options.optInt(CDV_CONFIG_KEY_USER_SUBJECT_TO_GDPR, STATUS.UNKNOWN.getValue());
+            STATUS userSubjectToGDPRStatus = STATUS.valueOf(userSubjectToGDPRStatusInt);
+            config.setUserSubjectToGDPR(userSubjectToGDPRStatus);
+        }
+
+        // Consent
+
+        if (options.has(CDV_CONFIG_KEY_CONSENT_GIVEN)) {
+            int consentGivenStatusInt =
+                    options.optInt(CDV_CONFIG_KEY_CONSENT_GIVEN, STATUS.UNKNOWN.getValue());
+            STATUS consentStatus = STATUS.valueOf(consentGivenStatusInt);
+            config.setConsentStatus(consentStatus);
+        }
+
+        // Age Restricted User
+
+        if (options.has(CDV_CONFIG_KEY_AGE_RESTRICTED_USER)) {
+            int ageRestrictedUserInt =
+                    options.optInt(CDV_CONFIG_KEY_AGE_RESTRICTED_USER, STATUS.UNKNOWN.getValue());
+            STATUS ageRestrictedUserStatus = STATUS.valueOf(ageRestrictedUserInt);
+            config.setAgeRestrictedUserStatus(ageRestrictedUserStatus);
+        }
+
+        // AdMob Content Rating
+
+        String admobContentRating = options.optString(CDV_CONFIG_KEY_ADMOB_CONTENT_RATING);
+        if (!Strings.isEmptyOrWhitespace(admobContentRating)) {
+            config.setAdMobContentRating(admobContentRating);
+        }
+
+        // Test devices
+        config = generateTestDevices(options, config);
+
+        return config;
     }
 
     /**
-     * Show banner
-     * @param String position
+     * Network names will be passed in as lowercase - fortunately the Android SDK is NOT case sensitive
+     * @param options
+     * @return
      */
-    private void showBanner(final String position, TMAdListener listener) {
-        if(bannerAdView == null){
-            loadBanner(bannerType, listener);
+    private TapdaqConfig generateTestDevices(final JSONObject options,
+                                             final TapdaqConfig config) throws JSONException {
+
+        if (!options.has(CDV_CONFIG_KEY_ANDROID)) {
+            return config;
         }
-       
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                bannerAdView.setVisibility(View.VISIBLE);
-                if (!popupWindow.isShowing()) {
-                    popupWindow.showAtLocation(
-                            cordova.getActivity().getWindow().getDecorView().getRootView(),
-                            TapdaqHelper.GetBannerGravityFromString(position),
-                            0, 0);
+
+        JSONObject androidOptions = options.getJSONObject(CDV_CONFIG_KEY_ANDROID);
+
+        JSONArray testDevicesArray = androidOptions.optJSONArray(CDV_CONFIG_KEY_TEST_DEVICES);
+        if (testDevicesArray == null) {
+            return config;
+        }
+
+        for (int i = 0; i < testDevicesArray.length(); i++) {
+            JSONObject testDevicesEntry = testDevicesArray.getJSONObject(i);
+
+            String networkString = testDevicesEntry.optString(CDV_TEST_DEVICES_KEY_NETWORK);
+            if (Strings.isEmptyOrWhitespace(networkString)) {
+                continue;
+            }
+
+            int network = TMMediationNetworks.getID(networkString);
+
+            List<String> devices = new ArrayList<>();
+            JSONArray testDevicesJSONArray = testDevicesEntry.optJSONArray(CDV_TEST_DEVICES_KEY_DEVICES);
+
+            if (testDevicesJSONArray != null) {
+                for (int j = 0; j < testDevicesArray.length(); j++) {
+                    String device = testDevicesArray.optString(j);
+                    if (Strings.isEmptyOrWhitespace(device)) {
+                        continue;
+                    }
+
+                    devices.add(device);
                 }
             }
-        });
-    }
 
-    private void hideBanner () {
-        if(bannerAdView == null){
-            return;
+            config.registerTestDevices(network, devices);
         }
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                bannerAdView.setVisibility(View.GONE);
-                bannerAdView.destroy(cordova.getActivity());
-                bannerAdView = null;
-                popupWindow.dismiss();             
-            }
-        });
+
+        return config;
     }
 
-    private void loadBanner(TMAdListener listener){
-        loadBanner("", listener);
-    }
-
-    private void loadBanner (String bannerAdType, TMAdListener listener) {
-
-        log("load banner: " + bannerAdType);
-        bannerType = bannerAdType;
-        TMAdSize bannerAdSizes = TapdaqHelper.GetBannerSizeFromTypeString(bannerAdType);
-        if (bannerAdView == null) {
-            createBanner(bannerAdSizes);            
-        }        
-        bannerAdView.load(cordova.getActivity(), bannerAdSizes, listener);
-    }
-
-    private void dispatchEvent(String eventName, JSONObject eventData, CallbackContext callbackContext)
-    {
-        log("dispatchEvent: " + eventName + ", with data: " + eventData.toString());
-        try {
-            JSONObject res = new JSONObject();
-            res.put("event", eventName);
-            res.put("eventData", eventData);
-            PluginResult result = new PluginResult(PluginResult.Status.OK, res);
-            result.setKeepCallback(true);
-            callbackContext.sendPluginResult(result);
-        }catch (JSONException e){
-            error(e.getMessage(), e);
-            callbackContext.error("dispatch event "+eventName+" error");
+    private String convertBannerSize(String value) {
+        if(value.equalsIgnoreCase("standard")) {
+            return TDBanner.BANNER_STANDARD;
+        } else if(value.equalsIgnoreCase("medium")) {
+            return TDBanner.BANNER_MEDIUM_RECT;
+        } else if(value.equalsIgnoreCase("large")) {
+            return TDBanner.BANNER_LARGE;
+        } else if(value.equalsIgnoreCase("full")) {
+            return TDBanner.BANNER_FULL;
+        } else if(value.equalsIgnoreCase("leaderboard")) {
+            return TDBanner.BANNER_LEADERBOARD;
+        } else if(value.equalsIgnoreCase("smart")) {
+            return TDBanner.BANNER_SMART;
         }
+        return TDBanner.BANNER_STANDARD;
+    }
+    private class CDVTapdaqInitListener extends TMInitListener {
+
+        private static final String CDV_CALLBACK_DID_INITIALISE = "didInitialise";
+        private static final String CDV_CALLBACK_DID_FAIL_TO_INITIALISE = "didFailToInitialise";
+
+        private static final String CDV_CALLBACK_KEY_EVENT_NAME = "eventName";
+        private static final String CDV_CALLBACK_KEY_ERROR = "error";
+
+        private CallbackContext callbackContext;
+        private CDVTDErrorDeSer deserializer;
+
+        private CDVTapdaqInitListener(final CallbackContext callbackContext,
+                                      final CDVTDErrorDeSer deserializer) {
+            this.callbackContext = callbackContext;
+            this.deserializer = deserializer;
+        }
+
+        public void didInitialise() {
+            super.didInitialise();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_INITIALISE);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didFailToInitialise(TMAdError error) {
+            super.didFailToInitialise(error);
+            Map<String, Object> map =
+                    mapGivenErrorEvent(error, CDV_CALLBACK_DID_FAIL_TO_INITIALISE);
+            sendErrorCallbackGivenMap(map);
+        }
+
+        private Map<String, Object> mapGivenErrorEvent(final TMAdError adError,
+                                                       final String eventName) {
+            Map<String, Object> map = mapGivenEvent(eventName);
+            Map<String, Object> errorMap = deserializer.mapFromAdError(adError);
+            map.put(CDV_CALLBACK_KEY_ERROR, errorMap);
+            return map;
+        }
+
+        private Map<String, Object> mapGivenEvent(final String eventName) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(CDV_CALLBACK_KEY_EVENT_NAME, eventName);
+            return map;
+        }
+
+        private void sendSuccessCallbackGivenMap(final Map<String, Object> map) {
+            JSONObject jsonResponse;
+            try {
+                jsonResponse = deserializer.jsonObjectFromMap(map);
+            } catch (Exception e) {
+                // TODO log this as an error?
+                jsonResponse = new JSONObject();
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonResponse);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+
+        private void sendErrorCallbackGivenMap(final Map<String, Object> map) {
+            JSONObject jsonError;
+            try {
+                jsonError = deserializer.jsonObjectFromMap(map);
+            } catch (Exception e) {
+                // TODO log this as an error?
+                jsonError = new JSONObject();
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonError);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+
     }
 
+    private class CDVTapdaqAdListener extends TMAdListener {
 
-    protected JSONObject createEventResult(String type, String tag, JSONObject customFields)
-    {
-        JSONObject eventData = null;
-        try {
-            eventData = new JSONObject();
-            eventData.put("adType", type);
-            eventData.put("message", "");
-            if (tag != null) {
-                eventData.put("tag", tag);
+        private static final String CDV_CALLBACK_DID_LOAD = "didLoad";
+        private static final String CDV_CALLBACK_DID_FAIL_TO_LOAD = "didFailToLoad";
+        private static final String CDV_CALLBACK_WILL_DISPLAY = "willDisplay";
+        private static final String CDV_CALLBACK_DID_DISPLAY = "didDisplay";
+        private static final String CDV_CALLBACK_DID_FAIL_TO_DISPLAY = "didFailToDisplay";
+        private static final String CDV_CALLBACK_DID_CLICK = "didClick";
+        private static final String CDV_CALLBACK_DID_CLOSE = "didClose";
+        private static final String CDV_CALLBACK_DID_VALIDATE_REWARD = "didValidateReward";
+        private static final String CDV_CALLBACK_DID_REFRESH = "didRefresh";
+        private static final String CDV_CALLBACK_DID_FAIL_TO_REFRESH = "didFailToRefresh";
+
+        private static final String CDV_CALLBACK_KEY_ERROR = "error";
+        private static final String CDV_CALLBACK_KEY_RESPONSE = "response";
+        private static final String CDV_CALLBACK_KEY_EVENT_NAME = "eventName";
+        private static final String CDV_CALLBACK_KEY_AD_UNIT = "adUnit";
+        private static final String CDV_CALLBACK_KEY_PLACEMENT_TAG = "placementTag";
+        private static final String CDV_CALLBACK_KEY_REWARD = "reward";
+
+        private static final String CDV_REWARD_KEY_EVENT_ID = "eventId";
+        private static final String CDV_REWARD_KEY_NAME = "name";
+        private static final String CDV_REWARD_KEY_VALUE = "value";
+        private static final String CDV_REWARD_KEY_TAG = "placementTag";
+        private static final String CDV_REWARD_KEY_IS_VALID = "isValid";
+        private static final String CDV_REWARD_KEY_CUSTOM_JSON = "customJSON";
+
+        private String adUnit;
+        private String placementTag;
+        private CallbackContext callbackContext;
+        private CDVTDErrorDeSer deserializer;
+
+        private CDVTapdaqAdListener(final String adUnit,
+                                    final String placementTag,
+                                    final CallbackContext callbackContext,
+                                    final CDVTDErrorDeSer deserializer) {
+            this.adUnit = adUnit;
+            this.placementTag = placementTag;
+            this.callbackContext = callbackContext;
+            this.deserializer = deserializer;
+        }
+
+        @Override
+        public void didLoad() {
+            super.didLoad();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_LOAD, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didFailToLoad(TMAdError error) {
+            super.didFailToLoad(error);
+
+            Map<String, Object> map =
+                    mapGivenErrorEvent(error, CDV_CALLBACK_DID_FAIL_TO_LOAD, adUnit, placementTag);
+            sendErrorCallbackGivenMap(map);
+        }
+
+        @Override
+        public void willDisplay() {
+            super.willDisplay();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_WILL_DISPLAY, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didDisplay() {
+            super.didDisplay();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_DISPLAY, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didFailToDisplay(TMAdError error) {
+            super.didFailToDisplay(error);
+
+            Map<String, Object> map =
+                    mapGivenErrorEvent(error, CDV_CALLBACK_DID_FAIL_TO_DISPLAY, adUnit, placementTag);
+            sendErrorCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didClick() {
+            super.didClick();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_CLICK, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didClose() {
+            super.didClose();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_CLOSE, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didVerify(TDReward reward) {
+            super.didVerify(reward);
+
+            Map<String, Object> map =
+                    mapGivenEventAndReward(CDV_CALLBACK_DID_VALIDATE_REWARD, adUnit, placementTag, reward);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didRefresh() {
+            super.didRefresh();
+
+            Map<String, Object> map = mapGivenEvent(CDV_CALLBACK_DID_REFRESH, adUnit, placementTag);
+            sendSuccessCallbackGivenMap(map);
+        }
+
+        @Override
+        public void didFailToRefresh(TMAdError error) {
+            super.didFailToRefresh(error);
+
+            Map<String, Object> map =
+                    mapGivenErrorEvent(error, CDV_CALLBACK_DID_FAIL_TO_REFRESH, adUnit, placementTag);
+            sendErrorCallbackGivenMap(map);
+        }
+
+        private void sendSuccessCallbackGivenMap(final Map<String, Object> map) {
+            JSONObject jsonResponse;
+            try {
+                jsonResponse = deserializer.jsonObjectFromMap(map);
+            } catch (Exception e) {
+                // TODO log this as an error?
+                jsonResponse = new JSONObject();
             }
-            if(customFields != null){
-                Iterator<String> iter = customFields.keys();
-                while (iter.hasNext()) {
-                    String key = iter.next();
-                    String value = customFields.getString(key);
-                    eventData.put(key, value);
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonResponse);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+
+        private void sendErrorCallbackGivenMap(final Map<String, Object> map) {
+            JSONObject jsonError;
+            try {
+                jsonError = deserializer.jsonObjectFromMap(map);
+            } catch (Exception e) {
+                // TODO log this as an error?
+                jsonError = new JSONObject();
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonError);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+
+        private Map<String, Object> mapGivenEventAndReward(final String eventName,
+                                                           final String adUnit,
+                                                           final String placementTag,
+                                                           final TDReward reward) {
+            Map<String, Object> rewardMap = new HashMap<>();
+            rewardMap.put(CDV_REWARD_KEY_EVENT_ID, reward.getEventId());
+            rewardMap.put(CDV_REWARD_KEY_NAME, reward.getName());
+            rewardMap.put(CDV_REWARD_KEY_VALUE, reward.getValue());
+            rewardMap.put(CDV_REWARD_KEY_TAG, reward.getTag());
+            rewardMap.put(CDV_REWARD_KEY_IS_VALID, reward.isValid());
+            rewardMap.put(CDV_REWARD_KEY_CUSTOM_JSON, reward.getCustom_json());
+
+            Map<String, Object> map = mapGivenEvent(eventName, adUnit, placementTag);
+            if (map.containsKey(CDV_CALLBACK_KEY_RESPONSE)) {
+                Map<String, Object> responseMap = (Map<String, Object>) map.get(CDV_CALLBACK_KEY_RESPONSE);
+                if (responseMap != null) {
+                    responseMap.put(CDV_CALLBACK_KEY_REWARD, rewardMap);
                 }
             }
-        }catch (JSONException e){
-            error(e.getMessage(), e);
-        }
-        return eventData;
-    }
 
-    private boolean validateInitOptions(JSONObject options)
-    {
-        JSONObject androidOpts = null;
-        JSONArray enabledPlacements = null;
-        String appId = null;
-        String clientKey = null;
-        try{
-            androidOpts = options.getJSONObject("android");
-            appId = androidOpts.getString("appId");
-            clientKey = androidOpts.getString("clientKey");
-        }catch (JSONException ex){
-        }
-        if(androidOpts == null){
-            error("options should contain 'android' option");
-            return false;
+            return map;
         }
 
-        if(appId == null){
-            error("appId is a required field in options");
-            return false;
+        private Map<String, Object> mapGivenErrorEvent(final TMAdError adError,
+                                                       final String eventName,
+                                                       final String adUnit,
+                                                       final String placementTag) {
+            Map<String, Object> map = mapGivenEvent(eventName, adUnit, placementTag);
+            Map<String, Object> errorMap = deserializer.mapFromAdError(adError);
+            map.put(CDV_CALLBACK_KEY_ERROR, errorMap);
+            return map;
         }
 
-        if(clientKey == null){
-            error("clientkey is a required field in options");
-            return false;
-        }
+        private Map<String, Object> mapGivenEvent(final String eventName,
+                                                  final String adUnit,
+                                                  final String placementTag) {
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put(CDV_CALLBACK_KEY_AD_UNIT, adUnit);
+            responseMap.put(CDV_CALLBACK_KEY_PLACEMENT_TAG, placementTag);
 
-        try{
-            enabledPlacements = options.getJSONArray("enabledPlacements");
-        }catch (JSONException ex){
+
+            Map<String, Object> map = new HashMap<>();
+            map.put(CDV_CALLBACK_KEY_EVENT_NAME, eventName);
+            map.put(CDV_CALLBACK_KEY_RESPONSE, responseMap);
+            return map;
         }
-        if(enabledPlacements == null){
-            error("options should contain 'enabledPlacements' option");
-            return false;
-        }
-        return true;
 
     }
 
-    private boolean validateLoadOptions(JSONObject options)
-    {
-        String adType = null;
+    private class CDVTDErrorDeSer {
 
-        try{
-            adType = options.getString("adType");
-        }catch (JSONException ex){
-        }
-        if(adType == null){
-            error("options should contain 'adType' option");
-            return false;
-        }
+        private static final String ERROR_KEY_CODE = "code";
+        private static final String ERROR_KEY_MESSAGE = "message";
+        private static final String ERROR_KEY_SUB_ERRORS = "subErrors";
 
-        if(!availableAdTypes.contains(adType)){
-            error("adType has invalid value : '"+adType+"', should be in the list: " + join(", ", availableAdTypes));
-            return false;
+        private Gson gson;
+
+        private CDVTDErrorDeSer(final Gson gson) {
+            this.gson = gson;
         }
 
-        return true;
-
-    }
-
-    private boolean validateShowOptions(JSONObject options)
-    {
-        String adType = null;
-        String tag = null;
-
-        try{
-            adType = options.getString("adType");
-            tag = options.getString("tag");
-        }catch (JSONException ex){
-        }
-        if(adType == null){
-            error("options should contain 'adType' option");
-            return false;
+        private JSONObject jsonObjectFromMap(final Map<String, Object> map) throws JSONException {
+            String jsonString = gson.toJson(map);
+            return new JSONObject(jsonString);
         }
 
-        if(tag == null){
-            error("tag is a required field in options");
-            return false;
-        }
+        private Map<String, Object> mapFromAdError(final TMAdError error) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put(ERROR_KEY_CODE, error.getErrorCode());
+            errorMap.put(ERROR_KEY_MESSAGE, error.getErrorMessage());
 
-        if(!availableAdTypes.contains(adType)){
-            error("adType has invalid value : '"+adType+"', should be in the list: " + join(", ", availableAdTypes));
-            return false;
-        }
+            Map<String, List<TMAdError>> subErrors = error.getSubErrors();
 
-        return true;
-
-    }
-
-    private String join(String separator, List<String> list)
-    {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i< list.size(); i++){
-            builder.append(list.get(i));
-            if(i < list.size()-1){
-                builder.append(separator);
+            Map<String, List<Object>> subErrorsMap = new HashMap<>();
+            for (Map.Entry<String, List<TMAdError>> mapEntry : subErrors.entrySet()) {
+                List<Object> errorMapList = new ArrayList<>();
+                for (TMAdError subError : mapEntry.getValue()) {
+                    Map<String, Object> subErrorMap = mapFromAdError(subError);
+                    errorMapList.add(subErrorMap);
+                }
+                subErrorsMap.put(mapEntry.getKey(), errorMapList);
             }
+            if (subErrorsMap.size() > 0) {
+                errorMap.put(ERROR_KEY_SUB_ERRORS, subErrorsMap);
+            }
+
+            return errorMap;
         }
-        return builder.toString();
-    }
-
-    private void log(String data)
-    {
-        if(debugging) {
-            Log.i(TAG, data);
-        }
-    }
-
-    private void error(String data)
-    {
-        Log.e(TAG, data);
-    }
-
-    private void error(String message, Throwable ex)
-    {
-        Log.e(TAG, message, ex);
     }
 
 }
