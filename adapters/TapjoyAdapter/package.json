@@ -1,6 +1,6 @@
 {
-  "name": "Tapdaq-Tapjoy-Cordova-Plugin",
-  "version": "5.10.0",
+  "name": "cordova-plugin-tapdaq-tapjoy",
+  "version": "7.5.0",
   "description": "Tapdaq Tapjoy adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-tapjoy",
@@ -10,9 +10,6 @@
     ]
   },    
   "author": "Tapdaq",
-  "license": {
-    "type": "Commercial",
-    "url": "https://tapdaq.com/terms-and-conditions"
-  },
+  "license": "Commercial",
   "homepage": "https://tapdaq.com"
 }

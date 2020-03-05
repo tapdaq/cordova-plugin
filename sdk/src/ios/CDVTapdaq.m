@@ -1,1003 +1,526 @@
-/********* CDVTapdaq.m Cordova Plugin Implementation *******/
-
 #import "CDVTapdaq.h"
-#import "TapdaqMoreApps.h"
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
+#import <Tapdaq/Tapdaq+PluginSupport.h>
+#import "CDVTapdaqDelegate.h"
+#import "CDVTDAdRequestDelegate.h"
+#import "CDVInvokedUrlCommand+tapdaq.h"
 
-static NSString *const kCDVTDNativeAdType1x1Large = @"NativeAdType1x1Large";
-static NSString *const kCDVTDNativeAdType1x1Medium = @"NativeAdType1x1Medium";
-static NSString *const kCDVTDNativeAdType1x1Small = @"NativeAdType1x1Small";
+static NSString *const kCDVTDPropertiesLogLevelValueDebug = @"debug";
+static NSString *const kCDVTDPropertiesLogLevelValueInfo = @"info";
+static NSString *const kCDVTDPropertiesLogLevelValueWarning = @"warning";
+static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 
-static NSString *const kCDVTDNativeAdType1x2Large = @"NativeAdType1x2Large";
-static NSString *const kCDVTDNativeAdType1x2Medium = @"NativeAdType1x2Medium";
-static NSString *const kCDVTDNativeAdType1x2Small = @"NativeAdType1x2Small";
-static NSString *const kCDVTDNativeAdType2x1Large = @"NativeAdType2x1Large";
-static NSString *const kCDVTDNativeAdType2x1Medium = @"NativeAdType2x1Medium";
-static NSString *const kCDVTDNativeAdType2x1Small = @"NativeAdType2x1Small";
+@interface CDVTapdaq()
+@property (nonatomic, strong) Tapdaq *tapdaq;
+@property (nonatomic, strong) CDVTapdaqDelegate* tapdaqDelegate;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, CDVTDAdRequestDelegate*> *adRequests;
 
-static NSString *const kCDVTDNativeAdType2x3Large = @"NativeAdType2x3Large";
-static NSString *const kCDVTDNativeAdType2x3Medium = @"NativeAdType2x3Medium";
-static NSString *const kCDVTDNativeAdType2x3Small = @"NativeAdType2x3Small";
-static NSString *const kCDVTDNativeAdType3x2Large = @"NativeAdType3x2Large";
-static NSString *const kCDVTDNativeAdType3x2Medium = @"NativeAdType3x2Medium";
-static NSString *const kCDVTDNativeAdType3x2Small = @"NativeAdType3x2Small";
-
-static NSString *const kCDVTDNativeAdType1x5Large = @"NativeAdType1x5Large";
-static NSString *const kCDVTDNativeAdType1x5Medium = @"NativeAdType1x5Medium";
-static NSString *const kCDVTDNativeAdType1x5Small = @"NativeAdType1x5Small";
-static NSString *const kCDVTDNativeAdType5x1Large = @"NativeAdType5x1Large";
-static NSString *const kCDVTDNativeAdType5x1Medium = @"NativeAdType5x1Medium";
-static NSString *const kCDVTDNativeAdType5x1Small = @"NativeAdType5x1Small";
-
-static NSString *const kCDVTDAdTypeNone = @"AdTypeNone";
-static NSString *const kCDVTDAdTypeInterstitial = @"AdTypeInterstitial";
-static NSString *const kCDVTDAdTypeVideo = @"AdTypeVideo";
-static NSString *const kCDVTDAdTypeRewardedVideo = @"AdTypeRewardedVideo";
-static NSString *const kCDVTDAdTypeBanner = @"AdTypeBanner";
-static NSString *const kCDVTDAdTypeOfferwall = @"AdTypeOfferwall";
-static NSString *const kCDVTDAdTypeMoreApps = @"AdTypeMoreApps";
-
-static NSString *const kCDVTDCallbackDidInitialise = @"didInitialise";
-static NSString *const kCDVTDCallbackDidLoad = @"didLoad";
-static NSString *const kCDVTDCallbackDidFailToLoad = @"didFailToLoad";
-static NSString *const kCDVTDCallbackDidClick = @"didClick";
-static NSString *const kCDVTDCallbackDidRefresh = @"didRefresh";
-static NSString *const kCDVTDCallbackWillDisplay = @"willDisplay";
-static NSString *const kCDVTDCallbackDidDisplay = @"didDisplay";
-static NSString *const kCDVTDCallbackDidClose = @"didClose";
-static NSString *const kCDVTDCallbackDidVerify = @"didVerify";
-static NSString *const kCDVTDCallbackDidRewardFail = @"didRewardFail";
-static NSString *const kCDVTDCallbackDidCustomEvent = @"didCustomEvent";
+@end
 
 @implementation CDVTapdaq
 
+- (void)pluginInitialize
+{
+    [super pluginInitialize];
+    
+    self.tapdaq = [Tapdaq sharedSession];
+    self.adRequests = [NSMutableDictionary new];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(removeAdRequestNotification:)
+                                               name:CDVTDAdRequestDelegateRemoveAdRequestNotification
+                                             object:nil];
+}
+
+/**
+ Init the plugin.
+ Waits until either didInitialise or didFailToInitialise is called
+ */
 - (void)init:(CDVInvokedUrlCommand *)command
 {
-    CDVPluginResult *pluginResult = nil;
-    self.callbackId = command.callbackId;
-    self.properties = [[TDProperties alloc] init];
-    
-    self.nativeAds = [[NSMutableDictionary alloc] init];
-    self.nativeAdTypes = @{
-                           kCDVTDNativeAdType1x1Large: @((int)TDNativeAdType1x1Large),
-                           kCDVTDNativeAdType1x1Medium: @((int)TDNativeAdType1x1Medium),
-                           kCDVTDNativeAdType1x1Small: @((int)TDNativeAdType1x1Small),
-                           
-                           kCDVTDNativeAdType1x2Large: @((int)TDNativeAdType1x2Large),
-                           kCDVTDNativeAdType1x2Medium: @((int)TDNativeAdType1x2Medium),
-                           kCDVTDNativeAdType1x2Small: @((int)TDNativeAdType1x2Small),
-                           
-                           kCDVTDNativeAdType2x1Large: @((int)TDNativeAdType2x1Large),
-                           kCDVTDNativeAdType2x1Medium: @((int)TDNativeAdType2x1Medium),
-                           kCDVTDNativeAdType2x1Small: @((int)TDNativeAdType2x1Small),
-                           
-                           kCDVTDNativeAdType2x3Large: @((int)TDNativeAdType2x3Large),
-                           kCDVTDNativeAdType2x3Medium: @((int)TDNativeAdType2x3Medium),
-                           kCDVTDNativeAdType2x3Small: @((int)TDNativeAdType2x3Small),
-                           
-                           kCDVTDNativeAdType3x2Large: @((int)TDNativeAdType3x2Large),
-                           kCDVTDNativeAdType3x2Medium: @((int)TDNativeAdType3x2Medium),
-                           kCDVTDNativeAdType3x2Small: @((int)TDNativeAdType3x2Small),
-                           
-                           kCDVTDNativeAdType1x5Large: @((int)TDNativeAdType1x5Large),
-                           kCDVTDNativeAdType1x5Medium: @((int)TDNativeAdType1x5Medium),
-                           kCDVTDNativeAdType1x5Small: @((int)TDNativeAdType1x5Small),
-                           
-                           kCDVTDNativeAdType5x1Large: @((int)TDNativeAdType5x1Large),
-                           kCDVTDNativeAdType5x1Medium: @((int)TDNativeAdType5x1Medium),
-                           kCDVTDNativeAdType5x1Small: @((int)TDNativeAdType5x1Small)
-                           };
-    
-    self.validAdTypes = @{
-                          kCDVTDAdTypeNone: @(0),
-                          kCDVTDAdTypeInterstitial: @(1),
-                          kCDVTDNativeAdType1x1Large: @(2),
-                          kCDVTDNativeAdType1x1Medium: @(3),
-                          kCDVTDNativeAdType1x1Small: @(4),
-                          
-                          kCDVTDNativeAdType1x2Large: @(5),
-                          kCDVTDNativeAdType1x2Medium: @(6),
-                          kCDVTDNativeAdType1x2Small: @(7),
-                          
-                          kCDVTDNativeAdType2x1Large: @(8),
-                          kCDVTDNativeAdType2x1Medium: @(9),
-                          kCDVTDNativeAdType2x1Small: @(10),
-                          
-                          kCDVTDNativeAdType2x3Large: @(11),
-                          kCDVTDNativeAdType2x3Medium: @(12),
-                          kCDVTDNativeAdType2x3Small: @(13),
-                          
-                          kCDVTDNativeAdType3x2Large: @(14),
-                          kCDVTDNativeAdType3x2Medium: @(15),
-                          kCDVTDNativeAdType3x2Small: @(16),
-                          
-                          kCDVTDNativeAdType1x5Large: @(17),
-                          kCDVTDNativeAdType1x5Medium: @(18),
-                          kCDVTDNativeAdType1x5Small: @(19),
-                          
-                          kCDVTDNativeAdType5x1Large: @(20),
-                          kCDVTDNativeAdType5x1Medium: @(21),
-                          kCDVTDNativeAdType5x1Small: @(22),
-                          
-                          kCDVTDAdTypeVideo: @(23),
-                          kCDVTDAdTypeRewardedVideo: @(24),
-                          kCDVTDAdTypeBanner: @(25),
-                          kCDVTDAdTypeOfferwall: @(26)
-                          };
-    
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    
-    NSDictionary *iosOptions = nil;
-    if ([options objectForKey:@"ios"]) {
-        iosOptions = (NSDictionary*)[options objectForKey:@"ios"];
-    }
-    
-    bool isValid = [self validateInitOptions:options];
-    
-    if (!isValid) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                         messageAsString:@"Incorrect options are given"];
-        [pluginResult setKeepCallbackAsBool:YES];
-        self.callbackId = command.callbackId;
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-        return;
-    }
-    
-    NSString *appId = [iosOptions objectForKey:@"appId"];
-    NSString *clientKey = [iosOptions objectForKey:@"clientKey"];
-    
-    NSMutableArray *enabledPlacements = nil;
-    if ([options objectForKey:@"enabledPlacements"]) {
-        enabledPlacements = (NSMutableArray *) [options objectForKey:@"enabledPlacements"];
-    }
-    
-    NSArray *testDevices = nil;
-    if ([iosOptions objectForKey:@"testDevices"]) {
-        testDevices = (NSArray *) [iosOptions objectForKey:@"testDevices"];
-    }
-    [self setTestDevices:testDevices toProperties:self.properties];
-    
-    BOOL isDebugEnabled = NO;
-    if ([options objectForKey:@"debugMode"]) {
-        isDebugEnabled = [[options objectForKey:@"debugMode"] boolValue];
-        self.isDebug = isDebugEnabled;
-    }
-    self.properties.isDebugEnabled = self.isDebug;
-    
-    BOOL autoReloadAds = NO;
-    if ([options objectForKey:@"autoReload"]) {
-        autoReloadAds = [[options objectForKey:@"autoReload"] boolValue];
-    }
-    self.properties.autoReloadAds = autoReloadAds;
-    
-    NSMutableDictionary *tagsWithAdTypes = [[NSMutableDictionary alloc] init];
-    
-    // register MoreApps tags as tags for TDNativeAdType1x1Medium
-    for (NSDictionary *dict in [enabledPlacements copy]) {
-        NSString *adTypeStr = [dict objectForKey:@"adType"];
-        NSArray *placementTags = [dict objectForKey:@"tags"];
-        if([adTypeStr isEqualToString:kCDVTDAdTypeMoreApps]){
-            NSDictionary *newPlacements = @{
-                                            @"adType": kCDVTDNativeAdType1x1Medium,
-                                            @"tags": placementTags
-                                            };
-            [enabledPlacements addObject: newPlacements];
-        }
-    }
-    for (NSDictionary *dict in enabledPlacements) {
-        
-        NSString *adTypeStr = [dict objectForKey:@"adType"];
-        NSArray *placementTags = [dict objectForKey:@"tags"];
-        
-        if ([placementTags count] > 0) {
-            for (NSString *placementTag in placementTags) {
-                
-                // update tagsWithAdTypes
-                NSNumber *combinedAdTypeNum = [tagsWithAdTypes objectForKey:placementTag];
-                
-                if (!combinedAdTypeNum) {
-                    combinedAdTypeNum = @(0);
-                }
-                
-                TDAdTypes adTypesCombined = [combinedAdTypeNum integerValue];
-                
-                NSNumber *adTypeNum = [self.validAdTypes objectForKey:adTypeStr];
-                NSInteger adTypeInt = [adTypeNum integerValue];
-                
-                adTypesCombined |= 1 << adTypeInt;
-                
-                combinedAdTypeNum = @(adTypesCombined);
-                
-                [tagsWithAdTypes setObject:combinedAdTypeNum forKey:placementTag];
-                
-            }
-        }
-        
-    }
-    [self log: [NSString stringWithFormat: @"tagsWithAdTypes: %@", tagsWithAdTypes]];
-    for (id key in tagsWithAdTypes) {
-        
-        if ([key isKindOfClass:[NSString class]] && [[tagsWithAdTypes objectForKey:key] integerValue] > 0) {
-            NSString *tag = (NSString *) key;
-            TDAdTypes adTypes = (TDAdTypes) [[tagsWithAdTypes objectForKey:key] integerValue];
-            
-            if (tag && [tag length] > 0) {
-                TDPlacement *placement = [[TDPlacement alloc] initWithAdTypes:adTypes forTag:tag];
-                [self.properties registerPlacement:placement];
-            }
-            
-        }
-        
-    }
+    TDProperties *properties = [self generatePropertiesGivenCommand:command];
+
+    // App ID
+    NSString *appId = [command td_getArgumentAppId];
+
+    // Client Key
+    NSString *clientKey = [command td_getArgumentClientKey];
     
     @try {
-        [[Tapdaq sharedSession] setApplicationId:appId clientKey:clientKey properties:self.properties];
-        [[Tapdaq sharedSession] launch];
-        [[Tapdaq sharedSession] setDelegate:self];
+        [self.commandDelegate runInBackground:^{
+            [self setTapdaqDelegate:[[CDVTapdaqDelegate alloc] initWithCommand:command usingDelegate:self.commandDelegate]];
+            [self.tapdaq setDelegate:[self tapdaqDelegate]];
+            [self.tapdaq setApplicationId:appId
+                                clientKey:clientKey
+                               properties:properties];
+        }];
     } @catch (NSException *exception) {
-        [self error: [NSString stringWithFormat: @"initialization error, reason: %@", exception.reason]];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: [@"initialization error: " stringByAppendingString:exception.reason]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        // TODO handle exception?
     }
-    
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
 }
 
-- (void)load:(CDVInvokedUrlCommand*)command
+- (CDVTDAdRequestDelegate*) generateAdRequestDelegateWithCommand:(CDVInvokedUrlCommand*)command shouldStore:(BOOL)shouldStore
 {
-    CDVPluginResult *pluginResult = nil;
-    self.callbackId = command.callbackId;
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
+    if (command.callbackId == nil) { return nil; }
+    CDVTDAdRequestDelegate* adRequestDelegate = [[CDVTDAdRequestDelegate alloc] initWithCommand:command usingDelegate:self.commandDelegate];
+    if (shouldStore) {
+        @synchronized (self.adRequests) { self.adRequests[command.callbackId] = adRequestDelegate; };
     }
-    
-    NSString *tag = nil;
-    if ([options objectForKey:@"tag"]) {
-        tag = (NSString*)[options objectForKey:@"tag"];
-    }
-    
-    NSString *size = nil;
-    if ([options objectForKey:@"size"]) {
-        size = (NSString*)[options objectForKey:@"size"];
-    }
-    
-    NSDictionary *moreAppsConfig = nil;
-    if ([options objectForKey:@"options"]) {
-        size = (NSString*)[options objectForKey:@"options"];
-    }
-    
-    if ([adType isEqualToString:kCDVTDAdTypeInterstitial]) {
-        if (tag) {
-            [[Tapdaq sharedSession] loadInterstitialForPlacementTag:tag];
-        } else {
-            [[Tapdaq sharedSession] loadInterstitial];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeVideo]) {
-        if (tag) {
-            [[Tapdaq sharedSession] loadVideoForPlacementTag:tag];
-        } else {
-            [[Tapdaq sharedSession] loadVideo];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeRewardedVideo]) {
-        if (tag) {
-            [[Tapdaq sharedSession] loadRewardedVideoForPlacementTag:tag];
-        } else {
-            [[Tapdaq sharedSession] loadRewardedVideo];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeBanner]) {
-        TDMBannerSize bannerSize = [self bannerSizeFromString:size];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[Tapdaq sharedSession] loadBanner:bannerSize];
-        });
-        
-    } else if ([adType isEqualToString:kCDVTDAdTypeOfferwall]) {
-        [[Tapdaq sharedSession] loadOfferwall];
-    } else if ([adType isEqualToString:kCDVTDAdTypeMoreApps]) {
-        if (moreAppsConfig != nil){
-            [[TapdaqMoreApps sharedInstance] loadWithConfig: moreAppsConfig];
-        }else{
-            [[TapdaqMoreApps sharedInstance] load];
-        }
-    } else {
-        NSNumber *nativeAdTypeNum = [self.nativeAdTypes objectForKey:adType];
-        
-        if (nativeAdTypeNum) {
-            TDNativeAdType type = [nativeAdTypeNum intValue];
-            [[Tapdaq sharedSession] loadNativeAdvertForPlacementTag:tag adType:type];
-        }
-    }
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    return adRequestDelegate;
 }
 
+- (void)launchDebugger:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self.tapdaq presentDebugViewController];
+        }];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)removeAdRequestNotification:(NSNotification *)notification {
+     CDVTDAdRequestDelegate *adRequestDelegate = notification.userInfo[CDVTDAdRequestDelegateDelegateKey];
+    [self removeAdRequestDelegate:adRequestDelegate];
+}
+
+- (void)removeAdRequestDelegate:(CDVTDAdRequestDelegate *)adRequestDelegate {
+    NSArray* keys = [self.adRequests allKeysForObject:adRequestDelegate];
+    NSString *key = [keys firstObject];
+    if (key != nil) {
+         @synchronized (self.adRequests) { self.adRequests[key] = nil; }
+    }
+}
+
+- (void)load:(CDVInvokedUrlCommand *)command
+{
+    TDAdUnit adUnit = [command td_getArgumentAdUnit];
+
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+
+    CDVTDAdRequestDelegate* adRequestDelegate = [self generateAdRequestDelegateWithCommand:command shouldStore:YES];
+
+    if (adUnit == TDUnitStaticInterstitial) {
+        [self.commandDelegate runInBackground:^{
+            [self.tapdaq loadInterstitialForPlacementTag:placementTag delegate:adRequestDelegate];
+        }];
+    } else if (adUnit == TDUnitVideoInterstitial) {
+        [self.commandDelegate runInBackground:^{
+            [self.tapdaq loadVideoForPlacementTag:placementTag delegate:adRequestDelegate];
+        }];
+    } else if (adUnit == TDUnitRewardedVideo) {
+        [self.commandDelegate runInBackground:^{
+            [self.tapdaq loadRewardedVideoForPlacementTag:placementTag delegate:adRequestDelegate];
+        }];
+    } else if (adUnit == TDUnitBanner) {
+
+        TDMBannerSize bannerSize = [command td_getArgumentBannerSize];
+        if (bannerSize == TDMBannerCustom) {
+            CGSize targetBannerSize = CGSizeMake([command td_getArgumentBannerWidth], [command td_getArgumentBannerHeight]);
+            [self.commandDelegate runInBackground:^{
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.tapdaq loadPluginBannerForPlacementTag:placementTag
+                                                  withTargetSize:targetBannerSize
+                                                        delegate:adRequestDelegate];
+                }];
+            }];
+
+        } else {
+            [self.commandDelegate runInBackground:^{
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.tapdaq loadPluginBannerForPlacementTag:placementTag
+                                                        withSize:bannerSize
+                                                        delegate:adRequestDelegate];
+                }];
+            }];
+        }
+
+    }
+}
 
 - (void)isReady:(CDVInvokedUrlCommand *)command
 {
-    CDVPluginResult *pluginResult = nil;
-    self.callbackId = command.callbackId;
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
-    }
-    
-    NSString *tag = nil;
-    if ([options objectForKey:@"tag"]) {
-        tag = (NSString*)[options objectForKey:@"tag"];
-    }
-    
-    BOOL result = NO;
-    
-    if ([adType isEqualToString:kCDVTDAdTypeInterstitial]) {
-        if (tag) {
-            result = [[Tapdaq sharedSession] isInterstitialReadyForPlacementTag:tag];
-        } else {
-            result = [[Tapdaq sharedSession] isInterstitialReady];
+    TDAdUnit adUnit = [command td_getArgumentAdUnit];
+
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+
+    __block BOOL isReady;
+    [self.commandDelegate runInBackground:^{
+        if (adUnit == TDUnitStaticInterstitial) {
+            isReady = [self.tapdaq isInterstitialReadyForPlacementTag:placementTag];
+        } else if (adUnit == TDUnitVideoInterstitial) {
+            isReady = [self.tapdaq isVideoReadyForPlacementTag:placementTag];
+        } else if (adUnit == TDUnitRewardedVideo) {
+            isReady = [self.tapdaq isRewardedVideoReadyForPlacementTag:placementTag];
+        } else if (adUnit == TDUnitBanner) {
+            isReady = [self.tapdaq isBannerReadyBannerForPlacementTag:placementTag];
         }
-    } else if ([adType isEqualToString:kCDVTDAdTypeVideo]) {
-        if (tag) {
-            result = [[Tapdaq sharedSession] isVideoReadyForPlacementTag:tag];
-        } else {
-            result = [[Tapdaq sharedSession] isVideoReady];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeRewardedVideo]) {
-        if (tag) {
-            result = [[Tapdaq sharedSession] isRewardedVideoReadyForPlacementTag:tag];
-        } else {
-            result = [[Tapdaq sharedSession] isRewardedVideoReady];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeBanner]) {
-        result = [[Tapdaq sharedSession] isBannerReady];
-    } else if ([adType isEqualToString:kCDVTDAdTypeOfferwall]) {
-        result = [[Tapdaq sharedSession] isOfferwallReady];
-    } else if ([adType isEqualToString:kCDVTDAdTypeMoreApps]) {
-        result = [[TapdaqMoreApps sharedInstance] isReady];
-    }
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:result];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                messageAsBool:isReady];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command
 {
-    CDVPluginResult *pluginResult = nil;
-    self.callbackId = command.callbackId;
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
-    }
-    
-    NSString *tag = nil;
-    if ([options objectForKey:@"tag"]) {
-        tag = (NSString*)[options objectForKey:@"tag"];
-    }
-    
-    NSString *position = nil;
-    if ([options objectForKey:@"position"]) {
-        position = (NSString*)[options objectForKey:@"position"];
-    }
-    
-    if ([adType isEqualToString:kCDVTDAdTypeInterstitial]) {
-        if (tag) {
-            [[Tapdaq sharedSession] showInterstitialForPlacementTag:tag];
+    TDAdUnit adUnit = [command td_getArgumentAdUnit];
+
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+
+    CDVTDAdRequestDelegate* adRequestDelegate = [self generateAdRequestDelegateWithCommand:command shouldStore:adUnit != TDUnitBanner];
+
+    if (adUnit == TDUnitStaticInterstitial) {
+        [self.commandDelegate runInBackground:^{
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tapdaq showInterstitialForPlacementTag:placementTag delegate:adRequestDelegate];
+            }];
+        }];
+    } else if (adUnit == TDUnitVideoInterstitial) {
+        [self.commandDelegate runInBackground:^{
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tapdaq showVideoForPlacementTag:placementTag delegate:adRequestDelegate];
+            }];
+        }];
+    } else if (adUnit == TDUnitRewardedVideo) {
+        [self.commandDelegate runInBackground:^{
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tapdaq showRewardedVideoForPlacementTag:placementTag delegate:adRequestDelegate];
+            }];
+        }];
+    } else if (adUnit == TDUnitBanner) {
+        TDBannerPositionType positionType = [command td_getArgumentBannerPosition];
+
+        TDBannerPosition position;
+        if (positionType == TDBannerPositionTypeCustom) {
+            CGPoint location = CGPointMake([command td_getArgumentBannerX], [command td_getArgumentBannerY]);
+            position = TDBannerPositionMakeCustom(location);
         } else {
-            [[Tapdaq sharedSession] showInterstitial];
+            position = TDBannerPositionMake(positionType);
         }
-    } else if ([adType isEqualToString:kCDVTDAdTypeVideo]) {
-        if (tag) {
-            [[Tapdaq sharedSession] showVideoForPlacementTag:tag];
-        } else {
-            [[Tapdaq sharedSession] showVideo];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeRewardedVideo]) {
-        if (tag) {
-            [[Tapdaq sharedSession] showRewardedVideoForPlacementTag:tag];
-        } else {
-            [[Tapdaq sharedSession] showRewardedVideo];
-        }
-    } else if ([adType isEqualToString:kCDVTDAdTypeBanner]) {
-        [self showBanner:position];
-    } else if ([adType isEqualToString:kCDVTDAdTypeOfferwall]) {
-        [[Tapdaq sharedSession] showOfferwall];
-    } else if ([adType isEqualToString:kCDVTDAdTypeMoreApps]) {
-        [[TapdaqMoreApps sharedInstance] show];
+
+        [self.commandDelegate runInBackground:^{
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tapdaq showBannerForPlacementTag:placementTag
+                                            atPosition:position
+                                                inView:self.webView];
+            }];
+        }];
     }
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+}
+
+- (void)hide:(CDVInvokedUrlCommand *)command
+{
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+
+    [self.tapdaq hideBannerForPlacementTag:placementTag];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
 }
 
-- (void)setTestDevices:(NSArray *)testDevicesDictionaryArray toProperties:(TDProperties *)properties
+- (void)destroy:(CDVInvokedUrlCommand *)command
 {
-    if(testDevicesDictionaryArray != nil) {
-        NSArray* amArray = nil;
-        NSArray* fbArray = nil;
-        for (NSDictionary* obj in testDevicesDictionaryArray) {
-            if([[obj objectForKey:@"network"] isEqual:@"AdMob"]){
-                amArray = (NSArray*) [obj objectForKey:@"devices"];
-                if(amArray != nil){
-                    TDTestDevices *amTestDevices = [[TDTestDevices alloc] initWithNetwork:TDMAdMob testDevices:amArray];
-                    [properties registerTestDevices: amTestDevices];
-                }
-            }
-            if([[obj objectForKey:@"network"] isEqual:@"Facebook"]){
-                fbArray = (NSArray*) [obj objectForKey:@"devices"];
-                if(fbArray != nil){
-                    TDTestDevices *amTestDevices = [[TDTestDevices alloc] initWithNetwork:TDMFacebookAudienceNetwork testDevices:fbArray];
-                    [properties registerTestDevices: amTestDevices];
-                }
-            }
-            
-        }
-    }
-}
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [[(CDVTDAdRequestDelegate *)evaluatedObject command] td_getArgumentAdUnit] == [command td_getArgumentAdUnit] && [[[(CDVTDAdRequestDelegate *)evaluatedObject command] td_getArgumentPlacementTag] isEqualToString:[command td_getArgumentPlacementTag]];
+    }];
+    [self removeAdRequestDelegate:[self.adRequests.allValues filteredArrayUsingPredicate:predicate].firstObject];
+    [self.tapdaq destroyBannerForPlacementTag:placementTag];
 
-- (void)showDebugPanel:(CDVInvokedUrlCommand*)command
-{
-    CDVPluginResult *pluginResult = nil;
-    self.callbackId = command.callbackId;
-    
-    [[Tapdaq sharedSession] presentDebugViewController];
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
 }
 
-- (void)showBanner:(NSString*)position
+- (void)userSubjectToGDPRStatus:(CDVInvokedUrlCommand *)command
 {
-    self.bannerView = [[Tapdaq sharedSession] getBanner];
-    
-    if (self.bannerView != nil) {
-        CGSize bannerSize = self.bannerView.frame.size;
-        CGSize webViewSize = self.webView.frame.size;
-        
-        // calculating Y of banner for "top" or "bottom" position
-        float bannerY = [[position lowercaseString] isEqualToString:@"top"] ?
-        0 : webViewSize.height-bannerSize.height;
-        
-        self.bannerView.frame = CGRectMake((webViewSize.width-bannerSize.width)/2,
-                                           bannerY,
-                                           bannerSize.width,
-                                           bannerSize.height);
-        
-        [self.webView addSubview:self.bannerView];
-    }
+    __block TDSubjectToGDPR subjectToGDPR;
+    [self.commandDelegate runInBackground:^{
+        subjectToGDPR = [self.tapdaq userSubjectToGDPR];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                            messageAsNSInteger:subjectToGDPR];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
 }
 
-- (void)hide:(CDVInvokedUrlCommand*)command
+- (void)setUserSubjectToGDPR:(CDVInvokedUrlCommand *)command
 {
-    self.callbackId = command.callbackId;
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
+    NSNumber *userSubjectToGDPRStatusNum = (NSNumber *) command.arguments.firstObject;
+    TDSubjectToGDPR userSubjectToGDPR = (TDSubjectToGDPR) [userSubjectToGDPRStatusNum integerValue];
     
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
-    }
-    if ([adType isEqualToString:kCDVTDAdTypeBanner]) {
-        if (self.bannerView != nil) {
-            [self.bannerView removeFromSuperview];
-            self.bannerView = nil;
-        }
-    }
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setUserSubjectToGDPR:userSubjectToGDPR];
+    }];
+    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
 }
 
-- (void)triggerNativeAdClick: (CDVInvokedUrlCommand*)command
+- (void)consentStatus:(CDVInvokedUrlCommand *)command
 {
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    NSString *uniqueId = nil;
-    if ([options objectForKey:@"id"]) {
-        uniqueId = (NSString*)[options objectForKey:@"id"];
-    }
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
-    }
-    
-    TDNativeAdvert *nativeAd = nil;
-    if ([self.nativeAds objectForKey: uniqueId]) {
-        nativeAd = (TDNativeAdvert*)[self.nativeAds objectForKey: uniqueId];
-    }
-    
-    if (nativeAd != nil) {
-        [nativeAd triggerClick];
-        
-    } else {
-        [self error:[NSString stringWithFormat:@"Could not find nativeAd with uniqueId: %@", uniqueId]];
-    }
+    __block BOOL isConsentGiven;
+    [self.commandDelegate runInBackground:^{
+        isConsentGiven = [self.tapdaq isConsentGiven];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                           messageAsNSInteger:(NSInteger) isConsentGiven];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
 }
 
-- (void)triggerNativeAdImpression: (CDVInvokedUrlCommand*)command
+- (void)setConsent:(CDVInvokedUrlCommand *)command
 {
-    NSDictionary *options = (NSDictionary*)[command.arguments objectAtIndex:0];
-    NSString *uniqueId = nil;
-    if ([options objectForKey:@"id"]) {
-        uniqueId = (NSString*)[options objectForKey:@"id"];
-    }
+    NSNumber *consentStatusNum = (NSNumber *) command.arguments.firstObject;
+    BOOL isConsentGiven = [consentStatusNum integerValue] == 1;
     
-    NSString *adType = nil;
-    if ([options objectForKey:@"adType"]) {
-        adType = (NSString*)[options objectForKey:@"adType"];
-    }
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setIsConsentGiven:isConsentGiven];
+    }];
     
-    TDNativeAdvert *nativeAd = nil;
-    if ([self.nativeAds objectForKey: uniqueId]) {
-        nativeAd = (TDNativeAdvert*)[self.nativeAds objectForKey: uniqueId];
-    }
-    
-    if(nativeAd != nil) {
-        [nativeAd triggerImpression];
-    } else {
-        [self error:[NSString stringWithFormat:@"Could not find nativeAd with uniqueId: %@", uniqueId]];
-    }
-    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
 }
 
-- (bool)validateInitOptions: (NSDictionary*)options
+- (void)ageRestrictedUserStatus:(CDVInvokedUrlCommand *)command
 {
-    NSDictionary *iosOptions = nil;
-    if ([options objectForKey:@"ios"]) {
-        iosOptions = (NSDictionary*)[options objectForKey:@"ios"];
-    }
+    __block BOOL isAgeRestrictedUser;
+    [self.commandDelegate runInBackground:^{
+        isAgeRestrictedUser = [self.tapdaq isAgeRestrictedUser];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                           messageAsNSInteger:(NSInteger) isAgeRestrictedUser];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setAgeRestrictedUser:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *ageRestrictedUserStatusNum = (NSNumber *) command.arguments.firstObject;
+    BOOL isAgeRestrictedUser = [ageRestrictedUserStatusNum integerValue] == 1;
     
-    if(options == nil){
-        return false;
-    }
-    NSString *appId = nil;
-    if ([iosOptions objectForKey:@"appId"]) {
-        appId = [iosOptions objectForKey:@"appId"];
-    }
-    if(appId == nil){
-        [self error:[NSString stringWithFormat:@"validate init options, appId is invalid"]];
-        return false;
-    }
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setIsAgeRestrictedUser:isAgeRestrictedUser];
+    }];
     
-    NSString *clientKey = nil;
-    if ([iosOptions objectForKey:@"clientKey"]) {
-        clientKey = [iosOptions objectForKey:@"clientKey"];
-    }
-    if(clientKey == nil){
-        [self error:[NSString stringWithFormat:@"validate init options, clientKey is invalid"]];
-        return false;
-    }
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)adMobContentRating:(CDVInvokedUrlCommand *)command
+{
+    __block NSString *adMobContentRating;
+
+    [self.commandDelegate runInBackground:^{
+        adMobContentRating = [self.tapdaq adMobContentRating];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsString:adMobContentRating];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)setAdMobContentRating:(CDVInvokedUrlCommand *)command
+{
+    NSString *adMobContentRating = (NSString *) command.arguments.firstObject;
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setAdMobContentRating:adMobContentRating];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+
+- (void)forwardUserId:(CDVInvokedUrlCommand *)command
+{
+    __block BOOL forwardUserId;
+    [self.commandDelegate runInBackground:^{
+        forwardUserId = [self.tapdaq forwardUserId];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                           messageAsBool:forwardUserId];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setForwardUserId:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *forwardUserIdNum = (NSNumber *) command.arguments.firstObject;
+
+    BOOL forwardUserId = [forwardUserIdNum boolValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setForwardUserId:forwardUserId];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)userId:(CDVInvokedUrlCommand *)command
+{
+    __block NSString *userId;
+
+    [self.commandDelegate runInBackground:^{
+        userId = [self.tapdaq userId];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsString:userId];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)setUserId:(CDVInvokedUrlCommand *)command
+{
+    NSString *userId = (NSString *) command.arguments.firstObject;
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq setUserId:userId];
+    }];
     
-    NSArray *enablePlacements = nil;
-    if ([options objectForKey:@"enabledPlacements"]) {
-        enablePlacements = [options objectForKey:@"enabledPlacements"];
-    }
-    if(enablePlacements == nil){
-        [self error:[NSString stringWithFormat:@"validate init options, enabledPlacements is invalid"]];
-        return false;
-    }
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)rewardId:(CDVInvokedUrlCommand *)command
+{
+    NSString *placementTag = (NSString *) command.arguments.firstObject;
+    __block NSString *rewardId;
     
-    return true;
+    [self.commandDelegate runInBackground:^{
+        rewardId = [self.tapdaq rewardIdForPlacementTag:placementTag];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                              messageAsString:rewardId];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setLogLevel:(CDVInvokedUrlCommand *)command
+{
+    NSString *logLevelString = (NSString *) command.arguments.firstObject;
+
+    TDLogLevel logLevel = [self logLevelFromString:logLevelString];
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq.properties setLogLevel:logLevel];
+    }];
+    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
 }
 
 #pragma mark - Private methods
 
-- (void)dispatchEvent:(NSString *)event forAdTypeString:(NSString *)adTypeStr
+- (TDProperties *)generatePropertiesGivenCommand:(CDVInvokedUrlCommand *)command
 {
-    [self dispatchEvent:event withPlacementTag:nil forAdTypeString:adTypeStr];
-}
-
-- (void)dispatchEvent:(NSString *)event
-     withPlacementTag:(NSString *)tag
-      forAdTypeString:(NSString *)adTypeStr
-{
-    NSDictionary *dict;
+    TDProperties *properties = [self.tapdaq properties];
     
-    if (tag) {
-        dict = @{
-                 @"adType": adTypeStr,
-                 @"tag": tag
-                 };
-    }else{
-        dict = @{
-                 @"adType": adTypeStr
-                 };
+    // Plugin version
+    NSString *pluginVersion = [command td_getArgumentPluginVersion];
+    if (pluginVersion) {
+        [properties setPluginVersion:pluginVersion];
     }
     
-    [self dispatchEvent:event withData:dict];
-}
-
-- (void)dispatchEvent:(NSString *)event withData:(NSDictionary *)eventData
-{
-    NSDictionary *response = @{
-                               @"event": event,
-                               @"eventData": eventData
-                               };
+    // Log Level
+    [properties setLogLevel:[self logLevelFromString:[command td_getArgumentLogLevel]]];
     
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                  messageAsDictionary:response];
-    [self log: [NSString stringWithFormat: @"dispatchEvent %@, eventData: %@", event, eventData]];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult
-                                callbackId:self.callbackId];
-}
-
-- (TDMBannerSize)bannerSizeFromString:(NSString *)sizeStr
-{
-    TDMBannerSize bannerSize = TDMBannerStandard;
-    
-    if ([sizeStr isEqualToString:@"STANDARD"]) {
-        bannerSize = TDMBannerStandard;
-    } else if ([sizeStr isEqualToString:@"LARGE"]) {
-        bannerSize = TDMBannerLarge;
-    } else if ([sizeStr isEqualToString:@"MEDIUM_RECT"]) {
-        bannerSize = TDMBannerMedium;
-    } else if ([sizeStr isEqualToString:@"FULL"]) {
-        bannerSize = TDMBannerFull;
-    } else if ([sizeStr isEqualToString:@"LEADERBOARD"]) {
-        bannerSize = TDMBannerLeaderboard;
-    } else if ([sizeStr isEqualToString:@"SMART"]) {
-        bannerSize = TDMBannerSmartPortrait;
+    // User ID
+    NSString *userId = [command td_getArgumentUserId];
+    if (userId) {
+        [properties setUserId:userId];
     }
     
-    return bannerSize;
-}
-
-- (NSString *)getStringFromAdType:(TDNativeAdType)adType
-{
-    NSArray* typeNumbers = [self.nativeAdTypes allKeysForObject:[NSNumber numberWithInt:(int)adType]];
-    if(typeNumbers.count < 1)
-        return @"TDNativeAdType1x1Large";
-    return typeNumbers[0];
-}
-
-#pragma mark - Tapdaq Delegate
-
-- (void)didLoadConfig
-{
-    [self dispatchEvent:kCDVTDCallbackDidInitialise
-               withData:@{}];
-}
-
-#pragma mark Banner delegate methods
-
-- (void)didLoadBanner
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad forAdTypeString:kCDVTDAdTypeBanner];
-}
-
-- (void)didFailToLoadBanner
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad forAdTypeString:kCDVTDAdTypeBanner];
-}
-
-- (void)didClickBanner
-{
-    [self dispatchEvent:kCDVTDCallbackDidClick forAdTypeString:kCDVTDAdTypeBanner];
-}
-
-- (void)didRefreshBanner
-{
-    [self dispatchEvent:kCDVTDCallbackDidRefresh forAdTypeString:kCDVTDAdTypeBanner];
-}
-
-#pragma mark Interstitial delegate methods
-
-- (void)didLoadInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-- (void)didFailToLoadInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-- (void)willDisplayInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackWillDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-- (void)didDisplayInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-- (void)didCloseInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClose
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-- (void)didClickInterstitialForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClick
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeInterstitial];
-}
-
-#pragma mark Video delegate methods
-
-- (void)didLoadVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-- (void)didFailToLoadVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-- (void)willDisplayVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackWillDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-- (void)didDisplayVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-- (void)didCloseVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClose
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-- (void)didClickVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClick
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeVideo];
-}
-
-#pragma mark Rewarded Video delegate methods
-
-- (void)didLoadRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)didFailToLoadRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)willDisplayRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackWillDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)didDisplayRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidDisplay
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)didCloseRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClose
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)didClickRewardedVideoForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidClick
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-- (void)rewardValidationSucceededForPlacementTag:(NSString *)placementTag
-                                      rewardName:(NSString *)rewardName
-                                    rewardAmount:(int)rewardAmount
-                                         payload:(NSDictionary *)payload
-{
-    NSMutableDictionary* dict = [@{
-                                   @"adType": kCDVTDAdTypeRewardedVideo,
-                                   @"tag": placementTag,
-                                   @"rewardName": rewardName,
-                                   @"rewardAmount": @(rewardAmount)
-                                   } mutableCopy];
-    if (payload) {
-        dict[@"payload"] = payload;
+    // Forward user ID
+    BOOL forwardUserId = [command td_getArgumentForwardUserId];
+    if (forwardUserId) {
+        [properties setForwardUserId:forwardUserId];
     }
     
-    [self dispatchEvent:kCDVTDCallbackDidVerify withData:dict];
-}
-
-- (void)rewardValidationErroredForPlacementTag:(NSString *)placementTag
-{
-    [self dispatchEvent:kCDVTDCallbackDidRewardFail
-       withPlacementTag:placementTag
-        forAdTypeString:kCDVTDAdTypeRewardedVideo];
-}
-
-#pragma mark Offerwall delegate methods
-
-- (void)didLoadOfferwall
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeOfferwall];
-}
-
-- (void)didFailToLoadOfferwall
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeOfferwall];
-}
-
-- (void)willDisplayOfferwall
-{
-    [self dispatchEvent:kCDVTDCallbackWillDisplay withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeOfferwall];
-}
-
-- (void)didDisplayOfferwall
-{
-    [self dispatchEvent:kCDVTDCallbackDidDisplay withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeOfferwall];
-}
-
-- (void)didCloseOfferwall
-{
-    [self dispatchEvent:kCDVTDCallbackDidClose withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeOfferwall];
-}
-
-- (void)didReceiveOfferwallCredits:(NSDictionary *)creditInfo
-{
-    NSMutableDictionary *dict = [creditInfo mutableCopy];
-    dict[@"adType"] = kCDVTDAdTypeOfferwall;
-    dict[@"tag"] = TDPTagDefault;
-    
-    [self dispatchEvent:kCDVTDCallbackDidCustomEvent
-               withData:dict];
-}
-
-#pragma mark MoreApps delegate methods
-
-- (void)didLoadMoreApps
-{
-    [self dispatchEvent:kCDVTDCallbackDidLoad withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeMoreApps];
-}
-
-- (void)didFailToLoadMoreApps
-{
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeMoreApps];
-}
-
-- (void)willDisplayMoreApps
-{
-    [self dispatchEvent:kCDVTDCallbackWillDisplay withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeMoreApps];
-}
-
-- (void)didDisplayMoreApps
-{
-    [self dispatchEvent:kCDVTDCallbackDidDisplay withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeMoreApps];
-}
-
-- (void)didCloseMoreApps
-{
-    [self dispatchEvent:kCDVTDCallbackDidClose withPlacementTag:TDPTagDefault forAdTypeString:kCDVTDAdTypeMoreApps];
-}
-
-#pragma mark Logging
-
-- (void)log:(NSString *)msg
-{
-    NSString *tag = @"[Tapdaq Cordova Plugin]";
-    NSLog(@"%@ [DEBUG] %@", tag, msg);
-}
-
-- (void)error:(NSString *)msg
-{
-    NSString *tag = @"[Tapdaq Cordova Plugin]";
-    NSLog(@"%@ [ERROR] %@", tag, msg);
-}
-
-#pragma mark Native delegate methods
-
-- (void)didLoadNativeAdvertForPlacementTag:(NSString *)tag adType:(TDNativeAdType)nativeAdType
-{
-    TDNativeAdvert *nativeAd =  [[Tapdaq sharedSession] getNativeAdvertForPlacementTag:tag
-                                                                                adType:nativeAdType];
-    NSDictionary *dict = [self convertNativeAd:nativeAd
-                                        forTag:tag];
-    if(dict != nil){
-        [self dispatchEvent:kCDVTDCallbackDidLoad
-                   withData:dict];
-    }
-}
-
-- (void)didFailToLoadNativeAdvertForPlacementTag:(NSString *)tag adType:(TDNativeAdType)nativeAdType
-{
-    NSString *nativeAdTypeString = [self getStringFromAdType:nativeAdType];
-    
-    [self dispatchEvent:kCDVTDCallbackDidFailToLoad
-       withPlacementTag:tag
-        forAdTypeString:nativeAdTypeString];
-}
-
-- (NSDictionary *)convertNativeAd:(TDNativeAdvert *)nativeAd forTag:(NSString *)tag
-{
-    if (!nativeAd) {
-        return nil;
+    // User Subject to GDPR
+    NSNumber *userSubjectToGDPRNumber = [command td_getArgumentSubjectToGdpr];
+    if (userSubjectToGDPRNumber != nil) {
+        [properties setUserSubjectToGDPR:(TDSubjectToGDPR) [userSubjectToGDPRNumber integerValue]];
     }
     
-    NSData *imageData;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *iconPath = [documentsDirectory stringByAppendingPathComponent:@"iconSelected2.png"]; //Add the file name
-    
-    if ([nativeAd.creative isKindOfClass:[TDImageCreative class]]) {
-        TDImageCreative *creative = (TDImageCreative *) nativeAd.creative;
-        imageData = UIImagePNGRepresentation(creative.image);
-        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"selected2.png"]; //Add the file name
-        [imageData writeToFile:filePath atomically:YES];
-    } else {
-        imageData = UIImagePNGRepresentation(nativeAd.icon);
-        [imageData writeToFile:iconPath atomically:YES];
+    // Consent
+    NSNumber *consentGivenNumber = [command td_getArgumentConsentGiven];
+    if (consentGivenNumber != nil) {
+        [properties setIsConsentGiven:[consentGivenNumber integerValue] == 1];
     }
     
-    NSString *uniqueId = [NSString stringWithFormat:@"%@-%@", [self getStringFromAdType:nativeAd.adType], nativeAd.subscriptionId];
+    // Age restricted user
+    NSNumber *ageRestrictedUserNumber = [command td_getArgumentAgeRestrictedUser];
+    if (ageRestrictedUserNumber != nil) {
+        [properties setIsAgeRestrictedUser:[ageRestrictedUserNumber integerValue] == 1];
+    }
     
-    NSDictionary *dict = @{
-                           @"adType": [self getStringFromAdType:nativeAd.adType],
-                           @"tag": tag,
-                           @"applicationId": nativeAd.applicationId,
-                           @"targetingId": nativeAd.targetingId,
-                           @"subscriptionId": nativeAd.subscriptionId,
-                           @"appName": nativeAd.appName,
-                           @"description": nativeAd.appDescription,
-                           @"buttonText": nativeAd.buttonText,
-                           @"developerName": nativeAd.developerName,
-                           @"ageRating": nativeAd.ageRating,
-                           @"appSize": @(nativeAd.appSize),
-                           @"averageReview": @(nativeAd.averageReview),
-                           @"totalReviews": @(nativeAd.totalReviews),
-                           @"category": nativeAd.category,
-                           @"appVersion": nativeAd.appVersion,
-                           @"price": @(nativeAd.price),
-                           @"iconUrl": [nativeAd.iconUrl absoluteString],
-                           @"iconPath": iconPath,
-                           @"creativeIdentifier": nativeAd.creative.identifier,
-                           @"imageUrl": [nativeAd.creative.url absoluteString],
-                           @"uniqueId": uniqueId
-                           };
+    // AdMob Content Rating
+    NSString *adMobContentRating = [command td_getArgumentAdMobContentRating];
+    if (adMobContentRating != nil) {
+        [properties setAdMobContentRating:adMobContentRating];
+    }
     
-    [self.nativeAds setObject:nativeAd
-                       forKey:uniqueId];
+    // Test Devices
+    NSArray<TDTestDevices *> *testDevices = [command td_getArgumentTestDevices];
+    for (TDTestDevices *device in testDevices) {
+        [properties registerTestDevices:device];
+    }
     
-    return dict;
+    return properties;
 }
 
+- (TDLogLevel)logLevelFromString:(NSString *)logLevelString {
+    TDLogLevel logLevel = TDLogLevelDisabled;
+
+    if ([logLevelString isEqualToString:kCDVTDPropertiesLogLevelValueInfo]) {
+        logLevel = TDLogLevelInfo;
+    } else if ([logLevelString isEqualToString:kCDVTDPropertiesLogLevelValueWarning]) {
+        logLevel = TDLogLevelWarning;
+    } else if ([logLevelString isEqualToString:kCDVTDPropertiesLogLevelValueError]) {
+        logLevel = TDLogLevelError;
+    } else if ([logLevelString isEqualToString:kCDVTDPropertiesLogLevelValueDebug]) {
+        logLevel = TDLogLevelDebug;
+    }
+
+    return logLevel;
+}
 @end
 

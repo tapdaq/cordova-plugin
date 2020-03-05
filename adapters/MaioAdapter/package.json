@@ -1,0 +1,15 @@
+{
+  "name": "cordova-plugin-tapdaq-maio",
+  "version": "7.4.0",
+  "description": "Tapdaq Maio adapter for Apache Cordova",
+  "cordova": {
+    "id": "cordova-plugin-tapdaq-maio",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },    
+  "author": "Tapdaq",
+  "license": "Commercial",
+  "homepage": "https://tapdaq.com"
+}

@@ -1,25 +1,21 @@
 {
-    "name": "com.tapdaq.tdcordovaproduction",
+    "name": "com.tapdaq.tdcordovaproductiontest",
     "displayName": "Tapdaq",
-    "version": "1.0.3",
+    "version": "4.0.0",
     "description": "Test application for tapdaq-cordova-plugin",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "Alexey Itsekson",
-    "license": "Apache-2.0",
+    "author": "Tapdaq",
+    "license": "Commercial",
     "dependencies": {
-        "cordova-ios": "^4.5.4",
         "cordova-plugin-whitelist": "^1.3.2"
     },
     "cordova": {
         "plugins": {
-            "cordova-plugin-whitelist": {},
-            "cordova-plugin-tapdaq": {}
+            "cordova-plugin-whitelist": {}
         },
-        "platforms": [
-            "ios"
-        ]
+        "platforms": []
     }
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-* {
+ * {
     -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
 }
 
@@ -47,13 +47,12 @@ body {
     }
 }
 
-h1 {
-    font-size:24px;
-    font-weight:normal;
-    margin:0px;
-    overflow:visible;
-    padding:0px;
-    text-align:center;
+.row {
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 0px !important;
 }
 
 .event {
@@ -87,19 +86,11 @@ h1 {
     to { opacity: 1.0; }
 }
  
-.blink {
-    animation:fade 3000ms infinite;
-    -webkit-animation:fade 3000ms infinite;
-}
-
 .status{
     font-size: 80%;
 }
 .console-log-div {
     font-family: monospace;
-    margin-top: 20px;
-    margin-left: 10px;
-    margin-right: 10px;
     border: 1px solid grey;
     border-radius: 5px;
     padding: 5px 10px;
@@ -121,48 +112,6 @@ h1 {
     font-size: 16px;
 }
 
-
-/* Tapdaq native ad example*/
-
-.native-ad-container{
-    position: fixed;
-    top:0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10000;
-    background-color: #fff;
-    display: none;
-}
-
-.native-ad-container img.tapdaq-ad-image{
-	width: 100%;
-}
-
-.native-ad-container .tapdaq-ad-icon{
-	position: absolute;
-	top: 10px;
-	left: 10px;
-}
-
-.native-ad-container .click-btn{
-	position: fixed;
-	bottom: 10px;
-	right: 10px;
-}
-.native-ad-container .close-btn{
-	position: fixed;
-	top: 10px;
-	right: 10px;
-	width: 15px;
-	width: 15px;
-	margin: 10px;
-	font-size: 30px;
-    padding: 0 5px;
-    line-height: 22px;
-    width: 27px;
-	z-index: 99999;
-}
 .hidden{
 	display: none;
 }

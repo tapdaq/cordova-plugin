@@ -1,7 +1,0 @@
-repositories {
-    maven { url "https://raw.githubusercontent.com/HyprMXMobile/Android-SDKs/master" }
-}
-
-dependencies {
-     compile 'com.hyprmx.android:HyprMX-SDK:4.3'
-}
