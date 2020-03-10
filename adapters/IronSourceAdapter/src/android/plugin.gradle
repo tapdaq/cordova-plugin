@@ -7,5 +7,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.5.1'
+    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.5.2'
 }

@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-chartboost-adapter",  
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Tapdaq Chartboost adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-chartboost",

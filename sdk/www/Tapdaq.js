@@ -170,7 +170,7 @@ var tapdaqExport = {
 
   init: function (config, opts, callback) {
     config = config || {}; // defaults to empty config
-    config.pluginVersion = "Cordova_4.0.1"; // add plugin version
+    config.pluginVersion = "Cordova_4.0.2"; // add plugin version
     exec(function (success) {
       handleResponse(success, opts, callback);
     }, function (failure) {
