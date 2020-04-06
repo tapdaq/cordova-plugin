@@ -194,6 +194,8 @@ static NSString *const kCDVTDPropertiesKeyAutoReloadAds = @"autoReloadAds";
         bannerSize = TDMBannerLeaderboard;
     } else if ([string isEqualToString:kCDVTDMBannerCustom]) {
         bannerSize = TDMBannerCustom;
+    } else if ([string isEqualToString:kCDVTDMBannerSmart]) {
+        bannerSize = TDMBannerSmart;
     }
     return bannerSize;
 }
