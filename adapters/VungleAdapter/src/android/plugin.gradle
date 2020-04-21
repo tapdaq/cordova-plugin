@@ -3,9 +3,8 @@ repositories {
     jcenter()
 
     maven { url "http://android-sdk.tapdaq.com" }
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqVungleAdapter:7.5.2'
+    implementation 'com.tapdaq.sdk:TapdaqVungleAdapter:7.5.3'
 }

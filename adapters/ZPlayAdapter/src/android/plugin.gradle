@@ -6,5 +6,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqZPlayAdapter:7.5.2'
+    implementation 'com.tapdaq.sdk:TapdaqZPlayAdapter:7.5.3'
 }

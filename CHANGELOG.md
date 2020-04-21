@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
+## 4.0.3 (2020-04-21)
+- Tapdaq Android SDK 7.5.3 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+
 ## 4.0.2 (2020-03-10)
 - Tapdaq Android SDK 7.5.2 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
 
