@@ -83,8 +83,11 @@ var app = {
         // Tapdaq.setUserSubjectToGDPR(Tapdaq.Status.TRUE);
         // Tapdaq.setConsent(Tapdaq.Status.TRUE);
         // Tapdaq.setAgeRestrictedUser(Tapdaq.Status.FALSE);
-        // Tapdaq.setAdMobContentRating("MA")
-        //
+        // Tapdaq.setAdMobContentRating("MA");
+        // Tapdaq.setUserSubjectToUSPrivacy(Tapdaq.Status.TRUE);
+        // Tapdaq.setUSPrivacy(Tapdaq.Status.TRUE);
+        // Tapdaq.setMuted(true);
+
         // Tapdaq.setForwardUserId(true);
         // Tapdaq.setUserId("Cordova User");
 
@@ -100,8 +103,20 @@ var app = {
             console.log("ageRestrictedUserStatus: " + status);
         });
 
+        Tapdaq.userSubjectToUSPrivacyStatus(function (status) {
+            console.log("userSubjectToUSPrivacyStatus: " + status);
+        });
+
+        Tapdaq.usPrivacyStatus(function (status) {
+            console.log("usPrivacyStatus: " + status);
+        });
+
         Tapdaq.adMobContentRating(function (status) {
             console.log("adMobContentRating: " + status);
+        });
+
+        Tapdaq.muted(function (status) {
+            console.log("muted: " + status);
         });
 
         Tapdaq.forwardUserId(function (status) {
@@ -156,7 +171,10 @@ var app = {
             // userSubjectToGDPR:Tapdaq.Status.UNKNOWN,
             // isConsentGiven:Tapdaq.Status.FALSE,
             // isAgeRestrictedUser: Tapdaq.Status.TRUE,
-            // adMobContentRating: Tapdaq.AdMobContentRating.G
+            // userSubjectToUSPrivacy: Tapdaq.Status.FALSE,
+            // usPrivacy: Tapdaq.Status.FALSE,
+            // adMobContentRating: Tapdaq.AdMobContentRating.G,
+            // muted:false
         };
         
         const loadOpts = {
@@ -259,6 +277,10 @@ var app = {
 
         showInterBtn.on("click", function(e) {
             e.preventDefault();
+            Tapdaq.getInterstitialFrequencyError(placementTag, function (e) {
+                console.log("IntersitialFrequencyCap - " + placementTag + " - " + JSON.stringify(e));
+            });
+
             Tapdaq.isInterstitialReady(placementTag, function (e) {
                console.log("isInterstitialReady - " + placementTag + " - " + e);
             });
@@ -274,6 +296,10 @@ var app = {
 
         showVideoBtn.on("click", function(e) {
             e.preventDefault();
+            Tapdaq.getVideoFrequencyError(placementTag, function (e) {
+                console.log("VideoFrequencyCap - " + placementTag + " - " + JSON.stringify(e));
+            });
+
             Tapdaq.isVideoReady(placementTag, function (e) {
                 console.log("isVideoReady - " + placementTag + " - " + e);
             });
@@ -290,6 +316,10 @@ var app = {
         
         showVideoRewardBtn.on("click", function(e) {
             e.preventDefault();
+            Tapdaq.getRewardedVideoFrequencyError(placementTag, function (e) {
+                console.log("RewardedVideoFrequencyCap - " + placementTag + " - " + JSON.stringify(e));
+            });
+
             Tapdaq.isRewardedVideoReady(placementTag, function (e) {
                 console.log("isRewardedVideoReady - " + placementTag + " - " + e);
             });

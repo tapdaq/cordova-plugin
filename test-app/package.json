@@ -1,7 +1,7 @@
 {
     "name": "com.tapdaq.tdcordovaproductiontest",
     "displayName": "Tapdaq",
-    "version": "4.0.3",
+    "version": "4.1.0",
     "description": "Test application for tapdaq-cordova-plugin",
     "main": "index.js",
     "scripts": {

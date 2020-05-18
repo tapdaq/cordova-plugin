@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-tapdaq-tiktok" version="4.0.3" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-plugin-tapdaq-pangle" version="4.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <name>Tapdaq TikTok Adapter</name>
+    <name>Tapdaq Pangle Adapter</name>
     <description></description>
     <keywords></keywords>
 
@@ -17,7 +17,7 @@
                 <source url="https://github.com/tapdaq/cocoapods-specs.git" />
             </config>
             <pods use-frameworks="true">
-                <pod name="Tapdaq/TikTok" spec="~> 7.5.2" />
+                <pod name="Tapdaq/Pangle" spec="~> 7.6.0" />
             </pods>
         </podspec>
     </platform>

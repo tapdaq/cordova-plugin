@@ -1,10 +1,19 @@
+android {
+    // Required for Chartboost 8
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
 repositories {
     google()
     jcenter()
 
+    maven { url  "https://chartboostmobile.bintray.com/Chartboost" }
     maven { url "http://android-sdk.tapdaq.com" }
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqChartboostAdapter:7.5.3'
+    implementation 'com.tapdaq.sdk:TapdaqChartboostAdapter:7.6.0'
 }

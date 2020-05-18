@@ -12,6 +12,8 @@
 
 - (void)isReady:(CDVInvokedUrlCommand *)command;
 
+- (void)getFrequencyCapError:(CDVInvokedUrlCommand *)command;
+
 - (void)show:(CDVInvokedUrlCommand *)command;
 
 - (void)hide:(CDVInvokedUrlCommand *)command;
@@ -30,6 +32,14 @@
 
 - (void)setAgeRestrictedUser:(CDVInvokedUrlCommand *)command;
 
+- (void)userSubjectToUSPrivacyStatus:(CDVInvokedUrlCommand *)command;
+
+- (void)setUserSubjectToUSPrivacy:(CDVInvokedUrlCommand *)command;
+
+- (void)usPrivacyStatus:(CDVInvokedUrlCommand *)command;
+
+- (void)setUSPrivacy:(CDVInvokedUrlCommand *)command;
+
 - (void)adMobContentRating:(CDVInvokedUrlCommand *)command;
 
 - (void)setAdMobContentRating:(CDVInvokedUrlCommand *)command;
@@ -41,6 +51,10 @@
 - (void)userId:(CDVInvokedUrlCommand *)command;
 
 - (void)setUserId:(CDVInvokedUrlCommand *)command;
+
+- (void)muted:(CDVInvokedUrlCommand *)command;
+
+- (void)setMuted:(CDVInvokedUrlCommand *)command;
 
 - (void)rewardId:(CDVInvokedUrlCommand *)command;
 

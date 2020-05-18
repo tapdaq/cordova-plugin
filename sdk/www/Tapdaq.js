@@ -148,6 +148,11 @@ var isReady = function (adUnit, placementTag, callback) {
   callPlugin(callback, null, "isReady", [config]);
 };
 
+var getFrequencyCapError = function (adUnit, placementTag, callback) {
+  var config = adConfig(adUnit, placementTag);
+  callPlugin(callback, null, "getFrequencyCapError", [config]);
+};
+
 var handleGetterSetter = function (property, value) {
   // Getter
   if (typeof value === "function") {
@@ -170,7 +175,7 @@ var tapdaqExport = {
 
   init: function (config, opts, callback) {
     config = config || {}; // defaults to empty config
-    config.pluginVersion = "Cordova_4.0.3"; // add plugin version
+    config.pluginVersion = "Cordova_4.1.0"; // add plugin version
     exec(function (success) {
       handleResponse(success, opts, callback);
     }, function (failure) {
@@ -230,6 +235,18 @@ var tapdaqExport = {
     isReady(adUnits.Banner, placementTag, callback);
   },
 
+  getInterstitialFrequencyError: function (placementTag, callback) {
+    getFrequencyCapError(adUnits.StaticInterstitial, placementTag, callback);
+  },
+
+  getVideoFrequencyError: function (placementTag, callback) {
+    getFrequencyCapError(adUnits.VideoInterstitial, placementTag, callback);
+  },
+
+  getRewardedVideoFrequencyError: function (placementTag, callback) {
+    getFrequencyCapError(adUnits.RewardedVideo, placementTag, callback);
+  },
+
   hideBanner: function (placementTag, callback) {
     var config = adConfig(adUnits.Banner, placementTag);
     callPlugin(callback, null, "hide", [config]);
@@ -272,6 +289,22 @@ var tapdaqExport = {
     handleGetterSetter("setAdMobContentRating", value);
   },
 
+  userSubjectToUSPrivacyStatus: function (callback) {
+    handleGetterSetter("userSubjectToUSPrivacyStatus", callback);
+  },
+
+  setUserSubjectToUSPrivacy: function (value) {
+    handleGetterSetter("setUserSubjectToUSPrivacy", value);
+  },
+
+  usPrivacyStatus: function (callback) {
+    handleGetterSetter("usPrivacyStatus", callback);
+  },
+
+  setUSPrivacy: function (value) {
+    handleGetterSetter("setUSPrivacy", value);
+  },
+
   forwardUserId: function (callback) {
     handleGetterSetter("forwardUserId", callback);
   },
@@ -286,6 +319,14 @@ var tapdaqExport = {
 
   setUserId: function (value) {
     handleGetterSetter("setUserId", value);
+  },
+
+  muted: function (callback) {
+    handleGetterSetter("muted", callback);
+  },
+
+  setMuted: function (value) {
+    handleGetterSetter("setMuted", value);
   },
 
   rewardId: function (placementTag, callback) {

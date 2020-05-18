@@ -3,8 +3,9 @@ repositories {
     jcenter()
 
     maven { url "http://android-sdk.tapdaq.com" }
+
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:Tapdaq-BaseSDK:7.5.3'
+    implementation 'com.tapdaq.sdk:Tapdaq-BaseSDK:7.6.0'
 }

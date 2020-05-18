@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
+
+## 4.1.0 (2020-05-18)
+- Tapdaq Android SDK 7.6.0 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Tapdaq iOS SDK 7.6.0 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
+- Renamed TikTok package to Pangle
+- Added CCPA support
+- Added mute support (where network supported)
+- Added Frequency capping interface
+
 ## 4.0.3 (2020-04-21)
 - Tapdaq Android SDK 7.5.3 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
 

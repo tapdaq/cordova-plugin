@@ -10,6 +10,7 @@ static NSString *const kCDVTDTestDevicesKeyNetwork = @"network";
 static NSString *const kCDVTDTestDevicesKeyDevices = @"devices";
 static NSString *const kCDVTDPropertiesKeyUserId = @"userId";
 static NSString *const kCDVTDPropertiesKeyForwardUserId = @"forwardUserId";
+static NSString *const kCDVTDPropertiesKeyMuted = @"muted";
 static NSString *const kCDVTDPropertiesKeyLogLevel = @"logLevel";
 
 static NSString *const kCDVTDOptsAdUnit = @"adUnit";
@@ -18,6 +19,8 @@ static NSString *const kCDVTDOptsPlacementTag = @"placementTag";
 static NSString *const kCDVTDPropertiesKeyUserSubjectToGDPR = @"userSubjectToGDPR";
 static NSString *const kCDVTDPropertiesKeyConsentGiven = @"isConsentGiven";
 static NSString *const kCDVTDPropertiesKeyAgeRestrictedUser = @"isAgeRestrictedUser";
+static NSString *const kCDVTDPropertiesKeyUserSubjectToUSPrivacy = @"userSubjectToUSPrivacy";
+static NSString *const kCDVTDPropertiesKeyUSPrivacy = @"usPrivacy";
 static NSString *const kCDVTDPropertiesKeyAdMobContentRating = @"adMobContentRating";
 
 static NSString *const kCDVTDOptsBannerSize = @"bannerSize";
@@ -91,8 +94,12 @@ static NSString *const kCDVTDPropertiesKeyAutoReloadAds = @"autoReloadAds";
     return [self td_getArgumentWithKey:kCDVTDPropertiesKeyUserId ofClass:NSString.class];
 }
 
-- (BOOL)td_getArgumentForwardUserId {
-    return [[self td_getArgumentWithKey:kCDVTDPropertiesKeyForwardUserId ofClass:NSNumber.class] boolValue];
+- (NSNumber *)td_getArgumentForwardUserId {
+    return [self td_getArgumentWithKey:kCDVTDPropertiesKeyForwardUserId ofClass:NSNumber.class];
+}
+
+- (NSNumber *)td_getArgumentMuted {
+    return [self td_getArgumentWithKey:kCDVTDPropertiesKeyMuted ofClass:NSNumber.class];
 }
 
 - (NSNumber *)td_getArgumentConsentGiven {
@@ -105,6 +112,16 @@ static NSString *const kCDVTDPropertiesKeyAutoReloadAds = @"autoReloadAds";
 
 - (NSNumber *)td_getArgumentAgeRestrictedUser {
     return [self td_getArgumentWithKey:kCDVTDPropertiesKeyAgeRestrictedUser ofClass:NSNumber.class];
+}
+
+- (NSNumber *)td_getArgumentSubjectToUSPrivacy
+{
+    return [self td_getArgumentWithKey:kCDVTDPropertiesKeyUserSubjectToUSPrivacy ofClass:NSNumber.class];
+}
+
+- (NSNumber *)td_getArgumentUSPrivacy
+{
+    return [self td_getArgumentWithKey:kCDVTDPropertiesKeyUSPrivacy ofClass:NSNumber.class];
 }
 
 - (NSString *)td_getArgumentAdMobContentRating {

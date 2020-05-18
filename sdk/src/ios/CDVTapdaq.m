@@ -168,6 +168,41 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
     }];
 }
 
+- (void)getFrequencyCapError:(CDVInvokedUrlCommand *)command
+{
+    TDAdUnit adUnit = [command td_getArgumentAdUnit];
+
+    NSString *placementTag = [command td_getArgumentPlacementTag];
+
+    __block TDError* error;
+    [self.commandDelegate runInBackground:^{
+        if (adUnit == TDUnitStaticInterstitial) {
+            error = [self.tapdaq interstitialCappedForPlacementTag:placementTag];
+        } else if (adUnit == TDUnitVideoInterstitial) {
+            error = [self.tapdaq videoCappedForPlacementTag:placementTag];
+        } else if (adUnit == TDUnitRewardedVideo) {
+            error = [self.tapdaq rewardedVideoCappedForPlacementTag:placementTag];
+        }
+
+        NSDictionary* errorDict;
+        if(error != nil) {
+            errorDict = @{
+                @"code": @(error.code),
+                @"message": (error.localizedDescription == nil ? @"" : error.localizedDescription)
+            };
+        } else {
+            errorDict = @{};
+        }
+
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                messageAsDictionary:errorDict];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
 - (void)show:(CDVInvokedUrlCommand*)command
 {
     TDAdUnit adUnit = [command td_getArgumentAdUnit];
@@ -244,9 +279,9 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 
 - (void)userSubjectToGDPRStatus:(CDVInvokedUrlCommand *)command
 {
-    __block TDSubjectToGDPR subjectToGDPR;
+    __block TDPrivacyStatus subjectToGDPR;
     [self.commandDelegate runInBackground:^{
-        subjectToGDPR = [self.tapdaq userSubjectToGDPR];
+        subjectToGDPR = [self.tapdaq.properties.privacySettings userSubjectToGdpr];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                             messageAsNSInteger:subjectToGDPR];
@@ -259,12 +294,12 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 - (void)setUserSubjectToGDPR:(CDVInvokedUrlCommand *)command
 {
     NSNumber *userSubjectToGDPRStatusNum = (NSNumber *) command.arguments.firstObject;
-    TDSubjectToGDPR userSubjectToGDPR = (TDSubjectToGDPR) [userSubjectToGDPRStatusNum integerValue];
-    
+    TDPrivacyStatus userSubjectToGDPR = (TDPrivacyStatus) [userSubjectToGDPRStatusNum integerValue];
+
     [self.commandDelegate runInBackground:^{
-        [self.tapdaq setUserSubjectToGDPR:userSubjectToGDPR];
+        [self.tapdaq.properties.privacySettings setUserSubjectToGdpr:userSubjectToGDPR];
     }];
-    
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult
@@ -273,12 +308,12 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 
 - (void)consentStatus:(CDVInvokedUrlCommand *)command
 {
-    __block BOOL isConsentGiven;
+    __block TDPrivacyStatus isConsentGiven;
     [self.commandDelegate runInBackground:^{
-        isConsentGiven = [self.tapdaq isConsentGiven];
+        isConsentGiven = [self.tapdaq.properties.privacySettings gdprConsentGiven];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                           messageAsNSInteger:(NSInteger) isConsentGiven];
+                                                       messageAsNSInteger: isConsentGiven];
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult
                                         callbackId:command.callbackId];
@@ -288,12 +323,12 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 - (void)setConsent:(CDVInvokedUrlCommand *)command
 {
     NSNumber *consentStatusNum = (NSNumber *) command.arguments.firstObject;
-    BOOL isConsentGiven = [consentStatusNum integerValue] == 1;
-    
+    TDPrivacyStatus isConsentGiven = [consentStatusNum integerValue];
+
     [self.commandDelegate runInBackground:^{
-        [self.tapdaq setIsConsentGiven:isConsentGiven];
+        [self.tapdaq.properties.privacySettings setGdprConsentGiven:isConsentGiven];
     }];
-    
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult
@@ -302,12 +337,12 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 
 - (void)ageRestrictedUserStatus:(CDVInvokedUrlCommand *)command
 {
-    __block BOOL isAgeRestrictedUser;
+    __block TDPrivacyStatus isAgeRestrictedUser;
     [self.commandDelegate runInBackground:^{
-        isAgeRestrictedUser = [self.tapdaq isAgeRestrictedUser];
+        isAgeRestrictedUser = [self.tapdaq.properties.privacySettings ageRestrictedUser];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                           messageAsNSInteger:(NSInteger) isAgeRestrictedUser];
+                                                           messageAsNSInteger:isAgeRestrictedUser];
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult
                                         callbackId:command.callbackId];
@@ -317,12 +352,70 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 - (void)setAgeRestrictedUser:(CDVInvokedUrlCommand *)command
 {
     NSNumber *ageRestrictedUserStatusNum = (NSNumber *) command.arguments.firstObject;
-    BOOL isAgeRestrictedUser = [ageRestrictedUserStatusNum integerValue] == 1;
-    
+    TDPrivacyStatus isAgeRestrictedUser = [ageRestrictedUserStatusNum integerValue];
+
     [self.commandDelegate runInBackground:^{
-        [self.tapdaq setIsAgeRestrictedUser:isAgeRestrictedUser];
+        [self.tapdaq.properties.privacySettings setAgeRestrictedUser:isAgeRestrictedUser];
     }];
-    
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)userSubjectToUSPrivacyStatus:(CDVInvokedUrlCommand *)command
+{
+    __block TDPrivacyStatus status;
+    [self.commandDelegate runInBackground:^{
+        status = [self.tapdaq.properties.privacySettings userSubjectToUSPrivacy];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                            messageAsNSInteger:status];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setUserSubjectToUSPrivacy:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *statusNum = (NSNumber *) command.arguments.firstObject;
+    TDPrivacyStatus status = (TDPrivacyStatus) [statusNum integerValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq.properties.privacySettings setUserSubjectToUSPrivacy:status];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)usPrivacyStatus:(CDVInvokedUrlCommand *)command
+{
+    __block TDPrivacyStatus status;
+        [self.commandDelegate runInBackground:^{
+        status = [self.tapdaq.properties.privacySettings usPrivacyDoNotSell];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                            messageAsNSInteger:status];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setUSPrivacy:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *statusNum = (NSNumber *) command.arguments.firstObject;
+    TDPrivacyStatus status = (TDPrivacyStatus) [statusNum integerValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq.properties.privacySettings setUsPrivacyDoNotSell:status];
+    }];
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult
@@ -409,7 +502,38 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
     [self.commandDelegate runInBackground:^{
         [self.tapdaq setUserId:userId];
     }];
-    
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+
+- (void)muted:(CDVInvokedUrlCommand *)command
+{
+    __block BOOL muted;
+    [self.commandDelegate runInBackground:^{
+        muted = [self.tapdaq.properties isMuted];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                           messageAsBool:muted];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setMuted:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *mutedNum = (NSNumber *) command.arguments.firstObject;
+
+    BOOL muted = [mutedNum boolValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq.properties setMuted:muted];
+    }];
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult
@@ -420,7 +544,7 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 {
     NSString *placementTag = (NSString *) command.arguments.firstObject;
     __block NSString *rewardId;
-    
+
     [self.commandDelegate runInBackground:^{
         rewardId = [self.tapdaq rewardIdForPlacementTag:placementTag];
 
@@ -438,9 +562,9 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 
     TDLogLevel logLevel = [self logLevelFromString:logLevelString];
     [self.commandDelegate runInBackground:^{
-        [self.tapdaq.properties setLogLevel:logLevel];
+        [TDLogger setLogLevel:logLevel];
     }];
-    
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult
@@ -452,44 +576,62 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
 - (TDProperties *)generatePropertiesGivenCommand:(CDVInvokedUrlCommand *)command
 {
     TDProperties *properties = [self.tapdaq properties];
-    
+
     // Plugin version
     NSString *pluginVersion = [command td_getArgumentPluginVersion];
     if (pluginVersion) {
         [properties setPluginVersion:pluginVersion];
     }
-    
+
     // Log Level
-    [properties setLogLevel:[self logLevelFromString:[command td_getArgumentLogLevel]]];
-    
+    [TDLogger setLogLevel:[self logLevelFromString:[command td_getArgumentLogLevel]]];
+
     // User ID
     NSString *userId = [command td_getArgumentUserId];
     if (userId) {
         [properties setUserId:userId];
     }
-    
+
     // Forward user ID
-    BOOL forwardUserId = [command td_getArgumentForwardUserId];
-    if (forwardUserId) {
-        [properties setForwardUserId:forwardUserId];
+    NSNumber *forwardUserId = [command td_getArgumentForwardUserId];
+    if (forwardUserId != nil) {
+        [properties setForwardUserId:[forwardUserId boolValue]];
     }
-    
+
+    // Muted
+    NSNumber *muted = [command td_getArgumentMuted];
+    if (muted != nil) {
+        [properties setMuted:[muted boolValue]];
+    }
+
     // User Subject to GDPR
     NSNumber *userSubjectToGDPRNumber = [command td_getArgumentSubjectToGdpr];
     if (userSubjectToGDPRNumber != nil) {
-        [properties setUserSubjectToGDPR:(TDSubjectToGDPR) [userSubjectToGDPRNumber integerValue]];
+        [properties.privacySettings setUserSubjectToGdpr:(TDPrivacyStatus) [userSubjectToGDPRNumber integerValue]];
     }
-    
+
     // Consent
     NSNumber *consentGivenNumber = [command td_getArgumentConsentGiven];
     if (consentGivenNumber != nil) {
-        [properties setIsConsentGiven:[consentGivenNumber integerValue] == 1];
+        [properties.privacySettings setGdprConsentGiven:(TDPrivacyStatus)[consentGivenNumber integerValue]];
     }
-    
+
     // Age restricted user
     NSNumber *ageRestrictedUserNumber = [command td_getArgumentAgeRestrictedUser];
     if (ageRestrictedUserNumber != nil) {
-        [properties setIsAgeRestrictedUser:[ageRestrictedUserNumber integerValue] == 1];
+        [properties.privacySettings setAgeRestrictedUser:(TDPrivacyStatus)[ageRestrictedUserNumber integerValue]];
+    }
+
+    // User Subject to USPrivacy
+    NSNumber *userSubjectToUSPrivacyNumber = [command td_getArgumentSubjectToUSPrivacy];
+    if (userSubjectToUSPrivacyNumber != nil) {
+        [properties.privacySettings setUserSubjectToUSPrivacy:(TDPrivacyStatus) [userSubjectToUSPrivacyNumber integerValue]];
+    }
+
+    // USPrivacy
+    NSNumber *usPrivacyNumber = [command td_getArgumentUSPrivacy];
+    if (usPrivacyNumber != nil) {
+        [properties.privacySettings setUsPrivacyDoNotSell:(TDPrivacyStatus) [usPrivacyNumber integerValue]];
     }
     
     // AdMob Content Rating

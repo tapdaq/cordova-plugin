@@ -37,6 +37,7 @@ public class CDVTapdaq extends CordovaPlugin {
     private static final String ACTION_LAUNCH_DEBUGGER = "launchDebugger";
     private static final String ACTION_LOAD_AD = "load";
     private static final String ACTION_IS_AD_READY = "isReady";
+    private static final String ACTION_FREQUENCY_CAP_ERROR = "getFrequencyCapError";
     private static final String ACTION_SHOW_AD = "show";
     private static final String ACTION_HIDE_AD = "hide";
     private static final String ACTION_DESTROY_AD = "destroy";
@@ -46,10 +47,16 @@ public class CDVTapdaq extends CordovaPlugin {
     private static final String ACTION_SET_CONSENT = "setConsent";
     private static final String ACTION_AGE_RESTRICTED_USER_STATUS = "ageRestrictedUserStatus";
     private static final String ACTION_SET_AGE_RESTRICTED_USER = "setAgeRestrictedUser";
+    private static final String ACTION_USER_SUBJECT_TO_USPrivacy_STATUS = "userSubjectToUSPrivacyStatus";
+    private static final String ACTION_SET_USER_SUBJECT_TO_USPrivacy = "setUserSubjectToUSPrivacy";
+    private static final String ACTION_USPrivacy_STATUS = "usPrivacyStatus";
+    private static final String ACTION_SET_USPrivacy = "setUSPrivacy";
     private static final String ACTION_FORWARD_USERID = "forwardUserId";
     private static final String ACTION_SET_FORWARD_USERID = "setForwardUserId";
     private static final String ACTION_USER_ID = "userId";
     private static final String ACTION_SET_USER_ID = "setUserId";
+    private static final String ACTION_MUTED = "muted";
+    private static final String ACTION_SET_MUTED = "setMuted";
     private static final String ACTION_REWARD_ID = "rewardId";
     private static final String ACTION_SET_LOG_LEVEL = "setLogLevel";
 
@@ -61,10 +68,13 @@ public class CDVTapdaq extends CordovaPlugin {
     private static final String CDV_CONFIG_KEY_PLUGIN_VERSION = "pluginVersion";
     private static final String CDV_CONFIG_KEY_USER_ID = "userId";
     private static final String CDV_CONFIG_KEY_FORWARD_USER_ID = "forwardUserId";
+    private static final String CDV_CONFIG_KEY_MUTED = "muted";
     private static final String CDV_CONFIG_KEY_LOG_LEVEL = "logLevel";
     private static final String CDV_CONFIG_KEY_USER_SUBJECT_TO_GDPR = "userSubjectToGDPR";
     private static final String CDV_CONFIG_KEY_CONSENT_GIVEN = "isConsentGiven";
     private static final String CDV_CONFIG_KEY_AGE_RESTRICTED_USER = "isAgeRestrictedUser";
+    private static final String CDV_CONFIG_KEY_USER_SUBJECT_TO_USPrivacy = "userSubjectToUSPrivacy";
+    private static final String CDV_CONFIG_KEY_USPrivacy = "usPrivacy";
     private static final String CDV_CONFIG_KEY_ADMOB_CONTENT_RATING = "adMobContentRating";
 
     private static final String CDV_AD_UNIT_INTERSTITIAL = "static_interstitial";
@@ -110,6 +120,8 @@ public class CDVTapdaq extends CordovaPlugin {
                 return loadAdAction(args, callbackContext);
             case ACTION_IS_AD_READY:
                 return isAdReadyAction(args, callbackContext);
+            case ACTION_FREQUENCY_CAP_ERROR:
+                return getFrequencyCapError(args, callbackContext);
             case ACTION_SHOW_AD:
                 return showAdAction(args, callbackContext);
             case ACTION_HIDE_AD:
@@ -128,6 +140,14 @@ public class CDVTapdaq extends CordovaPlugin {
                 return ageRestrictedUserStatusAction(callbackContext);
             case ACTION_SET_AGE_RESTRICTED_USER:
                 return setAgeRestrictedUserAction(args, callbackContext);
+            case ACTION_USER_SUBJECT_TO_USPrivacy_STATUS:
+                return userSubjectToUSPrivacyStatusAction(callbackContext);
+            case ACTION_SET_USER_SUBJECT_TO_USPrivacy:
+                return setUserSubjectToUSPrivacyAction(args, callbackContext);
+            case ACTION_USPrivacy_STATUS:
+                return usPrivacyStatusAction(callbackContext);
+            case ACTION_SET_USPrivacy:
+                return setUSPrivacyAction(args, callbackContext);
             case ACTION_FORWARD_USERID:
                 return forwardUserIdAction(callbackContext);
             case ACTION_SET_FORWARD_USERID:
@@ -136,6 +156,10 @@ public class CDVTapdaq extends CordovaPlugin {
                 return userIdAction(callbackContext);
             case ACTION_SET_USER_ID:
                 return setUserIdAction(args, callbackContext);
+            case ACTION_MUTED:
+                return mutedAction(callbackContext);
+            case ACTION_SET_MUTED:
+                return setMutedAction(args, callbackContext);
             case ACTION_REWARD_ID:
                 return rewardIdAction(args, callbackContext);
             case ACTION_SET_LOG_LEVEL:
@@ -277,6 +301,35 @@ public class CDVTapdaq extends CordovaPlugin {
         return true;
     }
 
+    private boolean getFrequencyCapError(final JSONArray args,
+                                            final CallbackContext callbackContext) throws JSONException {
+        JSONObject options = args.getJSONObject(0);
+
+        String adUnitStr = options.optString(CDV_OPTS_AD_UNIT, "");
+        String placementTagStr = options.optString(CDV_OPTS_PLACEMENT_TAG, "");
+
+        Activity activity = this.cordova.getActivity();
+
+        TMAdError error = new TMAdError();
+        switch (adUnitStr) {
+            case CDV_AD_UNIT_INTERSTITIAL:
+                error = tapdaq.getInterstitialFrequencyCapError(activity, placementTagStr);
+                break;
+            case CDV_AD_UNIT_VIDEO:
+                error = tapdaq.getVideoFrequencyCapError(activity, placementTagStr);
+                break;
+            case CDV_AD_UNIT_REWARDED_VIDEO:
+                error = tapdaq.getRewardedVideoFrequencyCapError(activity, placementTagStr);
+                break;
+        }
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, error.toString());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
+    }
+
     private boolean showAdAction(final JSONArray args,
                                  final CallbackContext callbackContext) throws JSONException {
         JSONObject options = args.getJSONObject(0);
@@ -366,7 +419,7 @@ public class CDVTapdaq extends CordovaPlugin {
 
     private boolean userSubjectToGDPRStatusAction(final CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
-        STATUS userSubjectToGDPRStatus = tapdaq.isUserSubjectToGDPR(activity);
+        STATUS userSubjectToGDPRStatus = tapdaq.getUserSubjectToGdprStatus();
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, userSubjectToGDPRStatus.getValue());
         pluginResult.setKeepCallback(true);
@@ -391,8 +444,7 @@ public class CDVTapdaq extends CordovaPlugin {
 
     private boolean consentStatusAction(final CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
-        boolean isConsentGiven = tapdaq.isConsentGiven(activity);
-        STATUS consentStatus =  (isConsentGiven) ? STATUS.TRUE : STATUS.FALSE;
+        STATUS consentStatus = tapdaq.getConsentStatus();
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, consentStatus.getValue());
         pluginResult.setKeepCallback(true);
@@ -403,10 +455,9 @@ public class CDVTapdaq extends CordovaPlugin {
     private boolean setConsentAction(final JSONArray args,
                                      final CallbackContext callbackContext) throws JSONException {
         int statusInt = args.getInt(0);
-        boolean isConsentGiven = statusInt == STATUS.TRUE.getValue();
 
         Activity activity = this.cordova.getActivity();
-        tapdaq.setContentGiven(activity, isConsentGiven);
+        tapdaq.setConsentGiven(activity, STATUS.valueOf(statusInt));
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
         pluginResult.setKeepCallback(true);
@@ -416,8 +467,7 @@ public class CDVTapdaq extends CordovaPlugin {
 
     private boolean ageRestrictedUserStatusAction(final CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
-        boolean isAgeRestrictedUser = tapdaq.isAgeRestrictedUser(activity);
-        STATUS ageRestrictedUserStatus = (isAgeRestrictedUser) ? STATUS.TRUE : STATUS.FALSE;
+        STATUS ageRestrictedUserStatus = tapdaq.getAgeRestrictedUserStatus();
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, ageRestrictedUserStatus.getValue());
         pluginResult.setKeepCallback(true);
@@ -428,10 +478,9 @@ public class CDVTapdaq extends CordovaPlugin {
     private boolean setAgeRestrictedUserAction(final JSONArray args,
                                                final CallbackContext callbackContext) throws JSONException {
         int statusInt = args.getInt(0);
-        boolean isAgeRestrictedUser = statusInt == STATUS.TRUE.getValue();
 
         Activity activity = this.cordova.getActivity();
-        tapdaq.setIsAgeRestrictedUser(activity, isAgeRestrictedUser);
+        tapdaq.setIsAgeRestrictedUser(activity, STATUS.valueOf(statusInt));
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
         pluginResult.setKeepCallback(true);
@@ -452,6 +501,53 @@ public class CDVTapdaq extends CordovaPlugin {
         String adMobContentRating = args.getString(0);
 
         tapdaq.config().setAdMobContentRating(adMobContentRating);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean userSubjectToUSPrivacyStatusAction(final CallbackContext callbackContext) {
+        STATUS status = tapdaq.getUserSubjectToUSPrivacyStatus();
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, status.getValue());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setUserSubjectToUSPrivacyAction(final JSONArray args,
+                                               final CallbackContext callbackContext) throws JSONException {
+        int statusInt = args.getInt(0);
+        STATUS status = STATUS.valueOf(statusInt);
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setUserSubjectToUSPrivacyStatus(activity, status);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+
+        return true;
+    }
+
+    private boolean usPrivacyStatusAction(final CallbackContext callbackContext) {
+        STATUS status =  tapdaq.getUSPrivacyStatus();
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, status.getValue());
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setUSPrivacyAction(final JSONArray args,
+                                        final CallbackContext callbackContext) throws JSONException {
+        int statusInt = args.getInt(0);
+        STATUS status = STATUS.valueOf(statusInt);
+
+        Activity activity = this.cordova.getActivity();
+        tapdaq.setUSPrivacyStatus(activity, status);
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
         pluginResult.setKeepCallback(true);
@@ -493,6 +589,26 @@ public class CDVTapdaq extends CordovaPlugin {
 
         Activity activity = this.cordova.getActivity();
         tapdaq.setUserId(activity, userId);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean mutedAction(final CallbackContext callbackContext) {
+        boolean muted = tapdaq.config().getMuted();
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, muted);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+        return true;
+    }
+
+    private boolean setMutedAction(final JSONArray args,
+                                    final CallbackContext callbackContext) throws JSONException {
+        boolean muted = args.getBoolean(0);
+
+        tapdaq.config().setMuted(muted);
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
         pluginResult.setKeepCallback(true);
@@ -550,9 +666,16 @@ public class CDVTapdaq extends CordovaPlugin {
         }
 
         // Forward User ID
+        if (options.has(CDV_CONFIG_KEY_FORWARD_USER_ID)) {
+            boolean forwardUserId = options.optBoolean(CDV_CONFIG_KEY_FORWARD_USER_ID);
+            config.setForwardUserId(forwardUserId);
+        }
 
-        boolean forwardUserId = options.optBoolean(CDV_CONFIG_KEY_FORWARD_USER_ID);
-        config.setForwardUserId(forwardUserId);
+        // Muted
+        if (options.has(CDV_CONFIG_KEY_MUTED)) {
+            boolean muted = options.optBoolean(CDV_CONFIG_KEY_MUTED);
+            config.setMuted(muted);
+        }
 
         // User Subject to GDPR
 
@@ -579,6 +702,20 @@ public class CDVTapdaq extends CordovaPlugin {
                     options.optInt(CDV_CONFIG_KEY_AGE_RESTRICTED_USER, STATUS.UNKNOWN.getValue());
             STATUS ageRestrictedUserStatus = STATUS.valueOf(ageRestrictedUserInt);
             config.setAgeRestrictedUserStatus(ageRestrictedUserStatus);
+        }
+
+        // User Subject to USPrivacy
+        if (options.has(CDV_CONFIG_KEY_USER_SUBJECT_TO_USPrivacy)) {
+            int statusInt = options.optInt(CDV_CONFIG_KEY_USER_SUBJECT_TO_USPrivacy, STATUS.UNKNOWN.getValue());
+            STATUS status = STATUS.valueOf(statusInt);
+            config.setUserSubjectToUSPrivacyStatus(status);
+        }
+
+        // USPrivacy
+        if (options.has(CDV_CONFIG_KEY_CONSENT_GIVEN)) {
+            int statusInt = options.optInt(CDV_CONFIG_KEY_USPrivacy, STATUS.UNKNOWN.getValue());
+            STATUS status = STATUS.valueOf(statusInt);
+            config.setUSPrivacyStatus(status);
         }
 
         // AdMob Content Rating

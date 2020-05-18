@@ -7,5 +7,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqAdColonyAdapter:7.5.3'
+    implementation 'com.tapdaq.sdk:TapdaqAdColonyAdapter:7.6.0'
 }

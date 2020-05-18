@@ -27,14 +27,20 @@ NSString *const CDVTDAdRequestDelegateDelegateKey = @"CDVTDAdRequestDelegateDele
                                                     userInfo:userInfo];
 }
 
-- (void)didLoadAdRequest:(TDAdRequest *)adRequest
+- (void)didLoadBannerAdRequest:(TDBannerAdRequest *)adRequest
 {
     NSDictionary *dict = [self dictionaryGivenEventName:kCDVTDCallbackDidLoad
                                               adRequest:adRequest];
 
-    if (adRequest.placement.adUnit != TDUnitBanner) {
-        [self postRemoveAdRequestNotification];
-    }
+    [self sendCallbackSuccessGivenDict:dict];
+}
+
+- (void)didLoadInterstitialAdRequest:(TDInterstitialAdRequest *)adRequest
+{
+    NSDictionary *dict = [self dictionaryGivenEventName:kCDVTDCallbackDidLoad
+                                              adRequest:adRequest];
+
+    [self postRemoveAdRequestNotification];
     [self sendCallbackSuccessGivenDict:dict];
 }
 

@@ -1,9 +1,9 @@
 {
-  "name": "@tapdaq/cordova-tiktok-adapter",
-  "version": "4.0.3",
-  "description": "Tapdaq TikTok adapter for Apache Cordova",
+  "name": "@tapdaq/cordova-pangle-adapter",
+  "version": "4.1.0",
+  "description": "Tapdaq Pangle adapter for Apache Cordova",
   "cordova": {
-    "id": "cordova-plugin-tapdaq-tiktok",
+    "id": "cordova-plugin-tapdaq-pangle",
     "platforms": [
       "ios"
     ]
@@ -11,12 +11,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tapdaq/cordova-plugin.git",
-    "directory": "adapters/TikTokAdapter"
+    "directory": "adapters/PangleAdapter"
   },
   "keywords": [
     "cordova",
     "tapdaq",
-    "tiktok",
+    "pangle",
     "ads",
     "advertising",
     "mobile",

@@ -5,5 +5,5 @@
 extern NSNotificationName const CDVTDAdRequestDelegateRemoveAdRequestNotification;
 extern NSString *const CDVTDAdRequestDelegateDelegateKey;
 
-@interface CDVTDAdRequestDelegate : CDVTDDelegateBase <TDAdRequestDelegate, TDDisplayableAdRequestDelegate, TDClickableAdRequestDelegate, TDRewardedVideoAdRequestDelegate, TDBannerAdRequestDelegate>
+@interface CDVTDAdRequestDelegate : CDVTDDelegateBase <TDAdRequestDelegate, TDBannerAdRequestDelegate, TDInterstitialAdRequestDelegate, TDRewardedVideoAdRequestDelegate, TDBannerAdRequestDelegate>
 @end

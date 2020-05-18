@@ -17,7 +17,9 @@
 
 - (NSString *)td_getArgumentPluginVersion;
 - (NSString *)td_getArgumentUserId;
-- (BOOL)td_getArgumentForwardUserId;
+// Returning these as NSNumber instead of basic types to know whether these settings were set.
+- (NSNumber *)td_getArgumentForwardUserId;
+- (NSNumber *)td_getArgumentMuted;
 
 // Privacy
 - (NSString *)td_getArgumentAdMobContentRating;
@@ -25,7 +27,8 @@
 - (NSNumber *)td_getArgumentConsentGiven;
 - (NSNumber *)td_getArgumentSubjectToGdpr;
 - (NSNumber *)td_getArgumentAgeRestrictedUser;
-
+- (NSNumber *)td_getArgumentSubjectToUSPrivacy;
+- (NSNumber *)td_getArgumentUSPrivacy;
 
 // Ads
 - (NSString *)td_getArgumentPlacementTag;
