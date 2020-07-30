@@ -7,5 +7,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:Tapdaq-BaseSDK:7.6.0'
+    implementation 'com.tapdaq.sdk:Tapdaq-BaseSDK:7.7.0'
+    implementation 'com.tapdaq.sdk:Tapdaq-CordovaBridge:7.7.0'
 }

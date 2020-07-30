@@ -56,7 +56,25 @@
 
 - (void)setMuted:(CDVInvokedUrlCommand *)command;
 
+- (void)setUserDataString:(CDVInvokedUrlCommand *)command;
+
+- (void)setUserDataBoolean:(CDVInvokedUrlCommand *)command;
+
+- (void)setUserDataInteger:(CDVInvokedUrlCommand *)command;
+
+- (void)userDataString:(CDVInvokedUrlCommand *)command;
+
+- (void)userDataBoolean:(CDVInvokedUrlCommand *)command;
+
+- (void)userDataInteger:(CDVInvokedUrlCommand *)command;
+
+- (void)allUserData:(CDVInvokedUrlCommand *)command;
+
+- (void)removeUserData:(CDVInvokedUrlCommand *)command;
+
 - (void)rewardId:(CDVInvokedUrlCommand *)command;
+
+- (void)networkStatuses:(CDVInvokedUrlCommand *)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand *)command;
 

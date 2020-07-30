@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-zplay-adapter",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "Tapdaq ZPlay adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-zplay",

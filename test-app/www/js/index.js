@@ -87,45 +87,72 @@ var app = {
         // Tapdaq.setUserSubjectToUSPrivacy(Tapdaq.Status.TRUE);
         // Tapdaq.setUSPrivacy(Tapdaq.Status.TRUE);
         // Tapdaq.setMuted(true);
-
+        //
         // Tapdaq.setForwardUserId(true);
         // Tapdaq.setUserId("Cordova User");
 
-        Tapdaq.userSubjectToGDPRStatus(function (status) {
-            console.log("userSubjectToGDPRStatus: " + status);
-        });
+       // Tapdaq.setUserDataBoolean("test_boolean", true);
+       // Tapdaq.setUserDataInteger("test_integer", 5);
+       // Tapdaq.setUserDataString("test_string", "hello world");
+       // Tapdaq.setUserDataInteger("test_integer_remove", false);
 
-        Tapdaq.consentStatus(function (status) {
-            console.log("consentStatus: " + status);
-        });
-
-        Tapdaq.ageRestrictedUserStatus(function (status) {
-            console.log("ageRestrictedUserStatus: " + status);
-        });
-
-        Tapdaq.userSubjectToUSPrivacyStatus(function (status) {
-            console.log("userSubjectToUSPrivacyStatus: " + status);
-        });
-
-        Tapdaq.usPrivacyStatus(function (status) {
-            console.log("usPrivacyStatus: " + status);
-        });
-
-        Tapdaq.adMobContentRating(function (status) {
-            console.log("adMobContentRating: " + status);
-        });
-
-        Tapdaq.muted(function (status) {
-            console.log("muted: " + status);
-        });
-
-        Tapdaq.forwardUserId(function (status) {
-            console.log("forwardUserId: " + status);
-        });
-
-        Tapdaq.userId(function (status) {
-            console.log("userId: " + status);
-        });
+        // Tapdaq.userSubjectToGDPRStatus(function (status) {
+        //     console.log("userSubjectToGDPRStatus: " + status);
+        // });
+        //
+        // Tapdaq.consentStatus(function (status) {
+        //     console.log("consentStatus: " + status);
+        // });
+        //
+        // Tapdaq.ageRestrictedUserStatus(function (status) {
+        //     console.log("ageRestrictedUserStatus: " + status);
+        // });
+        //
+        // Tapdaq.userSubjectToUSPrivacyStatus(function (status) {
+        //     console.log("userSubjectToUSPrivacyStatus: " + status);
+        // });
+        //
+        // Tapdaq.usPrivacyStatus(function (status) {
+        //     console.log("usPrivacyStatus: " + status);
+        // });
+        //
+        // Tapdaq.adMobContentRating(function (status) {
+        //     console.log("adMobContentRating: " + status);
+        // });
+        //
+        // Tapdaq.muted(function (status) {
+        //     console.log("muted: " + status);
+        // });
+        //
+        // Tapdaq.forwardUserId(function (status) {
+        //     console.log("forwardUserId: " + status);
+        // });
+        //
+        // Tapdaq.userId(function (status) {
+        //     console.log("userId: " + status);
+        // });
+        //
+        // Tapdaq.userDataBoolean("test_boolean", function(value) {
+        //     console.log("UserDataBoolean: " + value);
+        // });
+        //
+        // Tapdaq.userDataInteger("test_integer", function(value) {
+        //     console.log("UserDataInteger: " + value);
+        // });
+        //
+        // Tapdaq.userDataString("test_string", function(value) {
+        //     console.log("UserDataString: " + value);
+        // });
+        //
+        // Tapdaq.removeUserData("test_integer_remove");
+        //
+        // Tapdaq.allUserData(function(value) {
+        //     console.log("AllUserData: " + JSON.stringify(value));
+        // });
+        //
+        // Tapdaq.networkStatuses(function(value) {
+        //     console.log("Network Statuses: " + JSON.stringify(value));
+        // });
 
         var config = {
             ios: {
@@ -256,6 +283,10 @@ var app = {
                 didInitialise: function() {
                     console.log('cb: didInitialise');
                     allBtns.prop("disabled", false);
+
+                    // Tapdaq.networkStatuses(function(value) {
+                    //     console.log("Network Statuses: " + JSON.stringify(value));
+                    // });
                 },
                 didFailToInitialise: function(error) {
                     console.log('cb: didFailToInitialise: ' + JSON.stringify(error));

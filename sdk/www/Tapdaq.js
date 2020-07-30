@@ -175,7 +175,7 @@ var tapdaqExport = {
 
   init: function (config, opts, callback) {
     config = config || {}; // defaults to empty config
-    config.pluginVersion = "Cordova_4.1.1"; // add plugin version
+    config.pluginVersion = "Cordova_4.2.0"; // add plugin version
     exec(function (success) {
       handleResponse(success, opts, callback);
     }, function (failure) {
@@ -331,6 +331,42 @@ var tapdaqExport = {
 
   rewardId: function (placementTag, callback) {
     callPlugin(callback, null, "rewardId", [placementTag]);
+  },
+
+  setUserDataString: function (key, value) {
+    callPlugin(null, null, "setUserDataString", [key, value]);
+  },
+
+  setUserDataBoolean: function (key, value) {
+    callPlugin(null, null, "setUserDataBoolean", [key, value]);
+  },
+
+  setUserDataInteger: function (key, value) {
+    callPlugin(null, null, "setUserDataInteger", [key, value]);
+  },
+
+  userDataString: function (key, callback) {
+    callPlugin(callback, null, "userDataString", [key]);
+  },
+
+  userDataBoolean: function (key, callback) {
+    callPlugin(callback, null, "userDataBoolean", [key]);
+  },
+
+  userDataInteger: function (key, callback) {
+    callPlugin(callback, null, "userDataInteger", [key]);
+  },
+
+  allUserData: function (callback) {
+    handleGetterSetter("allUserData", callback);
+  },
+
+  removeUserData: function (key) {
+    handleGetterSetter("removeUserData", key);
+  },
+
+  networkStatuses: function (callback) {
+    handleGetterSetter("networkStatuses", callback);
   },
 
   setLogLevel: function (value) {

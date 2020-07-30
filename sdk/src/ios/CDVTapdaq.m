@@ -540,6 +540,129 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
                                 callbackId:command.callbackId];
 }
 
+- (void)setUserDataString:(CDVInvokedUrlCommand *)command
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    NSString *value = (NSString *) [command.arguments objectAtIndex:1];
+
+    [self.commandDelegate runInBackground:^{
+        [[self.tapdaq properties] setUserDataString:value forKey:key];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)setUserDataBoolean:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    NSNumber *valueNum = (NSNumber *) [command.arguments objectAtIndex:1];
+    BOOL value = (BOOL) [valueNum boolValue];
+
+    [self.commandDelegate runInBackground:^{
+        [[self.tapdaq properties] setUserDataBool:value forKey:key];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)setUserDataInteger:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    NSNumber *value = (NSNumber *) [command.arguments objectAtIndex:1];
+
+    [self.commandDelegate runInBackground:^{
+        [[self.tapdaq properties] setUserDataInteger:[value intValue] forKey:key];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
+- (void)userDataString:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    __block NSString *value;
+
+    [self.commandDelegate runInBackground:^{
+        value = [[self.tapdaq properties] userDataStringForKey:key];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsString:value];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)userDataBoolean:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    __block BOOL value;
+
+    [self.commandDelegate runInBackground:^{
+        value = [[self.tapdaq properties] userDataBoolForKey:key];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsBool:value];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)userDataInteger:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+    __block NSInteger value;
+
+    [self.commandDelegate runInBackground:^{
+        value = [[self.tapdaq properties] userDataIntegerForKey:key];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsNSInteger:value];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)allUserData:(CDVInvokedUrlCommand *)command;
+{
+    __block NSDictionary *value;
+
+    [self.commandDelegate runInBackground:^{
+        value = [[[Tapdaq sharedSession] properties] userData];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsDictionary:value];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
+    }];
+}
+
+- (void)removeUserData:(CDVInvokedUrlCommand *)command;
+{
+    NSString *key = (NSString *) [command.arguments objectAtIndex:0];
+
+    [self.commandDelegate runInBackground:^{
+        [[self.tapdaq properties] removeUserDataForKey:key];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
 - (void)rewardId:(CDVInvokedUrlCommand *)command
 {
     NSString *placementTag = (NSString *) command.arguments.firstObject;
@@ -553,6 +676,21 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult
                                         callbackId:command.callbackId];
+    }];
+}
+
+- (void)networkStatuses:(CDVInvokedUrlCommand *)command
+{
+    __block NSArray *value;
+
+    [self.commandDelegate runInBackground:^{
+        value = [self.tapdaq networkStatusesDictionary];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                  messageAsArray:value];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                            callbackId:command.callbackId];
     }];
 }
 

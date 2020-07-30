@@ -3,31 +3,36 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
+## 4.2.0 (2020-07-30)
+- Tapdaq Android SDK 7.7.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+- Tapdaq iOS SDK 7.7.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Added UserData interface for User Segmentation
+- Added NetworkStatuses interface
 
 ## 4.1.1 (2020-05-27)
-- Tapdaq iOS SDK 7.6.1 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
+- Tapdaq iOS SDK 7.6.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
 
 ## 4.1.0 (2020-05-18)
-- Tapdaq Android SDK 7.6.0 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
-- Tapdaq iOS SDK 7.6.0 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
+- Tapdaq Android SDK 7.6.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+- Tapdaq iOS SDK 7.6.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
 - Renamed TikTok package to Pangle
 - Added CCPA support
 - Added mute support (where network supported)
 - Added Frequency capping interface
 
 ## 4.0.3 (2020-04-21)
-- Tapdaq Android SDK 7.5.3 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Tapdaq Android SDK 7.5.3 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 
 ## 4.0.2 (2020-03-10)
-- Tapdaq Android SDK 7.5.2 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Tapdaq Android SDK 7.5.2 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 
 ## 4.0.1 (2020-03-09)
-- Tapdaq iOS SDK 7.5.2 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
+- Tapdaq iOS SDK 7.5.2 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
 
 ## 4.0.0 (2020-03-05)
 - Major rebuild of plugin, refactoring the interface
-- Tapdaq iOS SDK 7.5.1 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
-- Tapdaq Android SDK 7.5.1 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Tapdaq iOS SDK 7.5.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Tapdaq Android SDK 7.5.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 - Added support for Maio, Mintegral, TikTok (iOS), YouAppi & ZPlay
 - Removed support for HyprMX, MoPub, Receptiv
 - GDPR/COPPA Support
@@ -36,8 +41,8 @@ See: http://keepachangelog.com/ for documentation on how to update this change l
 
 ## 3.0.0 (2018-02-12)
 - Major rebuild of plugin
-- Tapdaq iOS SDK 5.10.0 [Read more.](https://github.com/tapdaq/tapdaq-ios-sdk/blob/master/CHANGELOG.md)
-- Tapdaq Android SDK 5.10.0 [Read more.](https://github.com/tapdaq/tapdaq-android-sdk/blob/master/CHANGELOG.md)
+- Tapdaq iOS SDK 5.10.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Tapdaq Android SDK 5.10.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 - Support for Adapters AdColony, AdMob, AppLovin, Chartboost, FAN, HyprMX, InMobi, IronSource, MoPub, Receptiv, TapJoy, UnityAds, Vungle
 
 ## 2.0.0 (2016-06-23)
