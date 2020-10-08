@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
+
+## 4.3.0 (2020-10-08)
+- Tapdaq Android SDK 7.8.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+- Tapdaq iOS SDK 7.8.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Removed Mintegral support
+- Removed ZPlay support
+- iOS 14 support
+
 ## 4.2.0 (2020-07-30)
 - Tapdaq Android SDK 7.7.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 - Tapdaq iOS SDK 7.7.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
