@@ -86,6 +86,7 @@ var app = {
         // Tapdaq.setAdMobContentRating("MA");
         // Tapdaq.setUserSubjectToUSPrivacy(Tapdaq.Status.TRUE);
         // Tapdaq.setUSPrivacy(Tapdaq.Status.TRUE);
+        // Tapdaq.setAdvertiserTracking(Tapdaq.Status.FALSE);
         // Tapdaq.setMuted(true);
         //
         // Tapdaq.setForwardUserId(true);
@@ -114,6 +115,10 @@ var app = {
         //
         // Tapdaq.usPrivacyStatus(function (status) {
         //     console.log("usPrivacyStatus: " + status);
+        // });
+        //
+        // Tapdaq.advertiserTracking(function (status) {
+        //     console.log("advertiserTracking: " + status);
         // });
         //
         // Tapdaq.adMobContentRating(function (status) {
@@ -200,6 +205,7 @@ var app = {
             // isAgeRestrictedUser: Tapdaq.Status.TRUE,
             // userSubjectToUSPrivacy: Tapdaq.Status.FALSE,
             // usPrivacy: Tapdaq.Status.FALSE,
+            // advertiserTracking:Tapdaq.Status.TRUE
             // adMobContentRating: Tapdaq.AdMobContentRating.G,
             // muted:false
         };

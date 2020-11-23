@@ -29,6 +29,7 @@
 - (NSNumber *)td_getArgumentAgeRestrictedUser;
 - (NSNumber *)td_getArgumentSubjectToUSPrivacy;
 - (NSNumber *)td_getArgumentUSPrivacy;
+- (NSNumber *)td_getArgumentAdvertiserTracking;
 
 // Ads
 - (NSString *)td_getArgumentPlacementTag;

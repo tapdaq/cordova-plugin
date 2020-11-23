@@ -175,7 +175,7 @@ var tapdaqExport = {
 
   init: function (config, opts, callback) {
     config = config || {}; // defaults to empty config
-    config.pluginVersion = "Cordova_4.3.0"; // add plugin version
+    config.pluginVersion = "Cordova_4.3.1"; // add plugin version
     exec(function (success) {
       handleResponse(success, opts, callback);
     }, function (failure) {
@@ -303,6 +303,14 @@ var tapdaqExport = {
 
   setUSPrivacy: function (value) {
     handleGetterSetter("setUSPrivacy", value);
+  },
+
+  advertiserTracking: function (callback) {
+    handleGetterSetter("advertiserTracking", callback);
+  },
+
+  setAdvertiserTracking: function (value) {
+    handleGetterSetter("setAdvertiserTracking", value);
   },
 
   forwardUserId: function (callback) {

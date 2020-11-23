@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
 
+## 4.3.1 (2020-11-23)
+- Tapdaq Android SDK 7.8.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+- Tapdaq iOS SDK 7.8.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Added AdvertiserTracking flag for iOS Facebook Audience Network
+
 ## 4.3.0 (2020-10-08)
 - Tapdaq Android SDK 7.8.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
 - Tapdaq iOS SDK 7.8.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)

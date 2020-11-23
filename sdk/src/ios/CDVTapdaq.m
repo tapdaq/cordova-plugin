@@ -422,6 +422,35 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
                                 callbackId:command.callbackId];
 }
 
+- (void)advertiserTracking:(CDVInvokedUrlCommand *)command
+{
+    __block TDPrivacyStatus status;
+        [self.commandDelegate runInBackground:^{
+        status = [self.tapdaq.properties.privacySettings advertiserTracking];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                            messageAsNSInteger:status];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult
+                                        callbackId:command.callbackId];
+    }];
+}
+
+- (void)setAdvertiserTracking:(CDVInvokedUrlCommand *)command
+{
+    NSNumber *statusNum = (NSNumber *) command.arguments.firstObject;
+    TDPrivacyStatus status = (TDPrivacyStatus) [statusNum integerValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.tapdaq.properties.privacySettings setAdvertiserTracking:status];
+    }];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult
+                                callbackId:command.callbackId];
+}
+
 - (void)adMobContentRating:(CDVInvokedUrlCommand *)command
 {
     __block NSString *adMobContentRating;
@@ -770,6 +799,12 @@ static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
     NSNumber *usPrivacyNumber = [command td_getArgumentUSPrivacy];
     if (usPrivacyNumber != nil) {
         [properties.privacySettings setUsPrivacyDoNotSell:(TDPrivacyStatus) [usPrivacyNumber integerValue]];
+    }
+
+    // AdvertiserTracking
+    NSNumber *advertiserTrackingNumber = [command td_getArgumentAdvertiserTracking];
+    if (advertiserTrackingNumber != nil) {
+        [properties.privacySettings setAdvertiserTracking:(TDPrivacyStatus) [advertiserTrackingNumber integerValue]];
     }
     
     // AdMob Content Rating

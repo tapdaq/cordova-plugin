@@ -40,6 +40,10 @@
 
 - (void)setUSPrivacy:(CDVInvokedUrlCommand *)command;
 
+- (void)advertiserTracking:(CDVInvokedUrlCommand *)command;
+
+- (void)setAdvertiserTracking:(CDVInvokedUrlCommand *)command;
+
 - (void)adMobContentRating:(CDVInvokedUrlCommand *)command;
 
 - (void)setAdMobContentRating:(CDVInvokedUrlCommand *)command;

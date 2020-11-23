@@ -21,6 +21,7 @@ static NSString *const kCDVTDPropertiesKeyConsentGiven = @"isConsentGiven";
 static NSString *const kCDVTDPropertiesKeyAgeRestrictedUser = @"isAgeRestrictedUser";
 static NSString *const kCDVTDPropertiesKeyUserSubjectToUSPrivacy = @"userSubjectToUSPrivacy";
 static NSString *const kCDVTDPropertiesKeyUSPrivacy = @"usPrivacy";
+static NSString *const kCDVTDPropertiesKeyAdvertiserTracking = @"advertiserTracking";
 static NSString *const kCDVTDPropertiesKeyAdMobContentRating = @"adMobContentRating";
 
 static NSString *const kCDVTDOptsBannerSize = @"bannerSize";
@@ -122,6 +123,12 @@ static NSString *const kCDVTDPropertiesKeyAutoReloadAds = @"autoReloadAds";
 - (NSNumber *)td_getArgumentUSPrivacy
 {
     return [self td_getArgumentWithKey:kCDVTDPropertiesKeyUSPrivacy ofClass:NSNumber.class];
+}
+
+
+- (NSNumber *)td_getArgumentAdvertiserTracking
+{
+    return [self td_getArgumentWithKey:kCDVTDPropertiesKeyAdvertiserTracking ofClass:NSNumber.class];
 }
 
 - (NSString *)td_getArgumentAdMobContentRating {
