@@ -4,7 +4,7 @@ Welcome to the community supported Tapdaq Cordova Plugin. This plugin is for iOS
 As of v3.0.0 the source code is now public in this repository, development of this plugin is open to the community and no longer officially supported by Tapdaq.
 
 ## Installation
-See our [quickstart](https://github.com/tapdaq/cordova-plugin/wiki/Quickstart) guide for instructions on how to integrate the SDK.
+See our [documentation](https://www.tapdaq.com/docs) for instructions on how to integrate the SDK.
 
 ## Development
 Source code for Tapdaq SDK is in sdk/ directory, all adapters can be found in adapters/ directory.
