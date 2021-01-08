@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-inmobi-adapter", 
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "Tapdaq InMobi adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-inmobi",

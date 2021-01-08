@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-fan-adapter",   
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "Tapdaq FAN adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-fan",

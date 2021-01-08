@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-maio-adapter",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "Tapdaq Maio adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-maio",

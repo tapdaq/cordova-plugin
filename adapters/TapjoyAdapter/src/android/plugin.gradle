@@ -11,5 +11,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqTapjoyAdapter:7.8.1'
+    implementation 'com.tapdaq.sdk:TapdaqTapjoyAdapter:7.8.2'
 }

@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-sdk",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "Tapdaq SDK for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq",
