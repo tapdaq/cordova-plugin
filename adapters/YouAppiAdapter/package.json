@@ -1,6 +1,6 @@
 {
   "name": "@tapdaq/cordova-youappi-adapter",
-  "version": "4.3.2",
+  "version": "4.3.3",
   "description": "Tapdaq YouAppi adapter for Apache Cordova",
   "cordova": {
     "id": "cordova-plugin-tapdaq-youappi",

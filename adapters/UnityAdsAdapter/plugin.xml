@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-tapdaq-unityads" version="4.3.2" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-plugin-tapdaq-unityads" version="4.3.3" xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <name>Tapdaq UnityAds Adapter</name>
@@ -22,7 +22,7 @@
                 <source url="https://github.com/tapdaq/cocoapods-specs.git" />
             </config>
             <pods use-frameworks="true">
-                <pod name="Tapdaq/UnityAds" spec="~> 7.8.1" />
+                <pod name="Tapdaq/UnityAds" spec="~> 7.8.2" />
             </pods>
         </podspec>
     </platform>
