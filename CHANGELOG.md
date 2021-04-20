@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
 
+## 4.3.4 (2021-04-20)
+- Tapdaq Android SDK 7.8.3 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+
 ## 4.3.3 (2021-01-18)
 - Tapdaq iOS SDK 7.8.2 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
 

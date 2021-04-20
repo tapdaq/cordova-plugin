@@ -8,5 +8,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqMaioAdapter:7.8.2'
+    implementation 'com.tapdaq.sdk:TapdaqMaioAdapter:7.8.3'
 }
