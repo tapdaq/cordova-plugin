@@ -408,6 +408,29 @@ var app = {
 
 
         });
+
+        //IDFA Request
+        const idfaPlugin = cordova.plugins.idfa;
+
+        idfaPlugin.getInfo()
+            .then(function(info) {
+                    if (!info.trackingLimited) {
+                        return info.idfa || info.aaid;
+                    } else if (info.trackingPermission === idfaPlugin.TRACKING_PERMISSION_NOT_DETERMINED) {
+                        return idfaPlugin.requestPermission().then(function(result) {
+                            if (result === idfaPlugin.TRACKING_PERMISSION_AUTHORIZED) {
+                                return idfaPlugin.getInfo().then(function(info) {
+                                    return info.idfa || info.aaid;
+                                });
+                            }
+                        });
+                    }
+            })
+            .then(function(idfaOrAaid){
+                if (idfaOrAaid) {
+                    console.log(idfaOrAaid);
+                }
+            });
     },
 
     // Update DOM on a Received Event

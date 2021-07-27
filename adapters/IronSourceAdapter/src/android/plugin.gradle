@@ -1,11 +1,9 @@
 repositories {
     google()
-    jcenter()
-
     maven { url "http://android-sdk.tapdaq.com" }
-    maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" }
+    maven {url 'https://android-sdk.is.com/'}
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.8.3'
+    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.9.0'
 }

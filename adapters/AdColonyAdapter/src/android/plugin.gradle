@@ -1,10 +1,9 @@
 repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven { url "http://android-sdk.tapdaq.com" }
-    maven { url  "https://adcolony.bintray.com/AdColony" }
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqAdColonyAdapter:7.8.3'
+    implementation 'com.tapdaq.sdk:TapdaqAdColonyAdapter:7.9.0'
 }

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-tapdaq-maio" version="4.3.4" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-plugin-tapdaq-maio" version="4.4.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <name>Tapdaq Maio Adapter</name>
@@ -18,11 +18,11 @@
     <platform name="ios">               
         <podspec>
             <config>
-                <source url="https://github.com/CocoaPods/Specs.git" />
+                <source url="https://cdn.cocoapods.org/" />
                 <source url="https://github.com/tapdaq/cocoapods-specs.git" />
             </config>
             <pods use-frameworks="true">
-                <pod name="Tapdaq/Maio" spec="~> 7.8.2" />
+                <pod name="Tapdaq/Maio" spec="~> 7.9.0" />
             </pods>
         </podspec>
     </platform>

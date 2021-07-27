@@ -1,10 +1,9 @@
 repositories {
     google()
     jcenter()
-
     maven { url "http://android-sdk.tapdaq.com" }
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqInmobiAdapter:7.8.3'
+    implementation 'com.tapdaq.sdk:TapdaqInmobiAdapter:7.9.0'
 }
