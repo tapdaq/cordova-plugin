@@ -1,7 +1,7 @@
 repositories {
     google()
     jcenter()
-    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "https://android-sdk.tapdaq.com" }
 }
 
 dependencies {
