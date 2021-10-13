@@ -1,7 +1,7 @@
 {
     "name": "com.tapdaq.tdcordovaproductiontest",
     "displayName": "Tapdaq",
-    "version": "4.4.1",
+    "version": "4.4.2",
     "description": "Test application for tapdaq-cordova-plugin",
     "main": "index.js",
     "scripts": {
@@ -9,12 +9,8 @@
     },
     "author": "Tapdaq",
     "license": "Commercial",
-    "dependencies": {
-        "cordova-plugin-whitelist": "^1.3.2"
-    },
     "cordova": {
         "plugins": {
-            "cordova-plugin-whitelist": {},
             "cordova-plugin-idfa": {}
         },
         "platforms": []

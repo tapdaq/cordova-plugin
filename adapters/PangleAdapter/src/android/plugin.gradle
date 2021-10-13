@@ -1,10 +1,10 @@
 repositories {
     google()
-    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "https://android-sdk.tapdaq.com" }
     maven { url "https://artifact.bytedance.com/repository/pangle" }
 
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqPangleAdapter:7.9.0'
+    implementation 'com.tapdaq.sdk:TapdaqPangleAdapter:7.9.1'
 }

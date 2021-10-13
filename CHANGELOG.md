@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
 
+## 4.4.2 (2021-10-13)
+- Cordova 10 Support
+
 ## 4.4.1 (2021-08-06)
 - Tapdaq iOS SDK 7.9.1 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
 

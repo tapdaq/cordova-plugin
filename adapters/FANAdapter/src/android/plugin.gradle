@@ -1,8 +1,8 @@
 repositories {
     google()
-    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "https://android-sdk.tapdaq.com" }
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqFANAdapter:7.9.0'
+    implementation 'com.tapdaq.sdk:TapdaqFANAdapter:7.9.1'
 }

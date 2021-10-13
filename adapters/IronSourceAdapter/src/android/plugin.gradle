@@ -1,9 +1,9 @@
 repositories {
     google()
-    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "https://android-sdk.tapdaq.com" }
     maven {url 'https://android-sdk.is.com/'}
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.9.0'
+    implementation 'com.tapdaq.sdk:TapdaqIronsourceAdapter:7.9.1'
 }

@@ -1,10 +1,10 @@
 repositories {
     google()
-    maven { url "http://android-sdk.tapdaq.com" }
+    maven { url "https://android-sdk.tapdaq.com" }
     maven { url "https://imobile-maio.github.io/maven" }
 
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqMaioAdapter:7.9.0'
+    implementation 'com.tapdaq.sdk:TapdaqMaioAdapter:7.9.1'
 }
