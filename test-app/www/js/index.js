@@ -195,11 +195,10 @@ var app = {
                         ]
                     }
                 ]
-            }
-            // ,
+            },
+            logLevel: Tapdaq.LogLevel.Debug
             // userId:"Demo User",
             // forwardUserId:false,
-            // logLevel: Tapdaq.LogLevel.Debug,
             // userSubjectToGDPR:Tapdaq.Status.UNKNOWN,
             // isConsentGiven:Tapdaq.Status.FALSE,
             // isAgeRestrictedUser: Tapdaq.Status.TRUE,

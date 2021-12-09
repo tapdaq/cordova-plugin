@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 See: http://keepachangelog.com/ for documentation on how to update this change log.
 
+## 4.5.0 (2021-12-09)
+- Tapdaq Android SDK 7.10.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-android-sdk/Changelog)
+- Tapdaq iOS SDK 7.10.0 [Read more.](https://www.tapdaq.com/docs/tapdaq-ios-sdk/Changelog)
+- Fixed iOS log level setter
+
 ## 4.4.2 (2021-10-13)
 - Cordova 10 Support
 

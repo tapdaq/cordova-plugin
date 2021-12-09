@@ -13,5 +13,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqChartboostAdapter:7.9.1'
+    implementation 'com.tapdaq.sdk:TapdaqChartboostAdapter:7.10.0'
 }

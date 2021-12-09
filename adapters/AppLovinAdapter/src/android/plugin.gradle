@@ -5,5 +5,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqAppLovinAdapter:7.9.1'
+    implementation 'com.tapdaq.sdk:TapdaqAppLovinAdapter:7.10.0'
 }

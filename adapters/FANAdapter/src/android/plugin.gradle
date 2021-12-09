@@ -4,5 +4,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.tapdaq.sdk:TapdaqFANAdapter:7.9.1'
+    implementation 'com.tapdaq.sdk:TapdaqFANAdapter:7.10.0'
 }

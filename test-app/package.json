@@ -1,7 +1,7 @@
 {
     "name": "com.tapdaq.tdcordovaproductiontest",
     "displayName": "Tapdaq",
-    "version": "4.4.2",
+    "version": "4.5.0",
     "description": "Test application for tapdaq-cordova-plugin",
     "main": "index.js",
     "scripts": {
@@ -11,7 +11,9 @@
     "license": "Commercial",
     "cordova": {
         "plugins": {
-            "cordova-plugin-idfa": {}
+            "cordova-plugin-idfa": {
+                "ANDROID_PLAY_ADID_VERSION": "17.1.0"
+            }
         },
         "platforms": []
     },

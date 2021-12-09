@@ -6,10 +6,10 @@
 #import "CDVTDAdRequestDelegate.h"
 #import "CDVInvokedUrlCommand+tapdaq.h"
 
-static NSString *const kCDVTDPropertiesLogLevelValueDebug = @"debug";
-static NSString *const kCDVTDPropertiesLogLevelValueInfo = @"info";
-static NSString *const kCDVTDPropertiesLogLevelValueWarning = @"warning";
-static NSString *const kCDVTDPropertiesLogLevelValueError = @"error";
+static NSString *const kCDVTDPropertiesLogLevelValueDebug = @"DEBUG";
+static NSString *const kCDVTDPropertiesLogLevelValueInfo = @"INFO";
+static NSString *const kCDVTDPropertiesLogLevelValueWarning = @"WARNING";
+static NSString *const kCDVTDPropertiesLogLevelValueError = @"ERROR";
 
 @interface CDVTapdaq()
 @property (nonatomic, strong) Tapdaq *tapdaq;
