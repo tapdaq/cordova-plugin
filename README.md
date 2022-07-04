@@ -1,3 +1,6 @@
+# DEPRECATED
+Tapdaq is now deprecated and the SDK will no longer intialise.
+
 # Cordova-Plugin
 Welcome to the community supported Tapdaq Cordova Plugin. This plugin is for iOS and Android targets only.
 
